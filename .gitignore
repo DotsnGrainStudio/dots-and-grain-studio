@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+
+# Design source files (not for web)
+*.psd
+*.tif
+*.TIF
+
+# Large unreferenced source videos
+02_fashion/The_Odd_Denim/Timeline 1(1).mp4
+02_fashion/The_Odd_Denim/Timeline 1.mp4
+02_fashion/The_Odd_Denim/WhatsApp Video 2025-05-21 at 09.00.35.mp4
+04_theater-costume/Amor_y_otros_Demonios/Sierva.mp4
+04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_02.mp4
+04_theater-costume/Colombian_Power/colombian_power_01.mp4
+05_music/Laiz/MENA.mp4
+05_music/The_New_Love_Experience/nlx_03.mov
+05_music/The_New_Love_Experience/nlx_04.mov
+05_music/The_New_Love_Experience/nlx_15.mp4
+05_music/The_New_Love_Experience/nlx_16.mp4
+05_music/The_New_Love_Experience/nlx_19.mp4
+07_makeup/On_Set_Makeup/on_set_01.mp4

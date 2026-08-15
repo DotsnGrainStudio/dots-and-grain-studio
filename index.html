@@ -1,0 +1,2772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dots &amp; Grain Studio — Sitadevi Zonneveld</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" id="dgs-favicon" type="image/png" href="favicon.png">
+  <meta name="description" content="Challenging single stories through design. Photography, Illustration, Textile, Theater &amp; Costume — Hildesheim / Worldwide." />
+
+  <link rel="stylesheet" href="fonts.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:   #F0EDE6;
+      --fg:   #1C1914;
+      --line: rgba(28,25,20,0.07);
+      --dim:  rgba(28,25,20,0.42);
+      --f-display: 'Cormorant Garamond', Georgia, serif;
+      --f-ui:      'Space Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--f-ui);
+      font-size: 13px;
+      line-height: 1.65;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ─── Scroll progress ───────────────────── */
+    #scroll-progress {
+      position: fixed; top: 0; left: 0; z-index: 210;
+      height: 1px; width: 0;
+      background: var(--fg); opacity: .12;
+      pointer-events: none;
+    }
+
+    /* ─── Cursor ─────────────────────────────── */
+    #cursor {
+      position: fixed;
+      width: 28px; height: 28px;
+      border: 1px solid rgba(28,25,20,0.7);
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width .2s, height .2s, border-radius .25s, opacity .3s;
+      will-change: transform;
+    }
+    #cursor.expand { width: 42px; height: 42px; border-radius: 50%; }
+    #cursor.hidden { opacity: 0; }
+
+    /* ─── Cursor label ───────────────────────── */
+    #cursor-label {
+      position: fixed; z-index: 9999;
+      pointer-events: none;
+      font-family: var(--f-ui);
+      font-size: 9px; letter-spacing: .2em;
+      text-transform: uppercase; color: var(--fg);
+      white-space: nowrap; opacity: 0;
+      transition: opacity .15s ease;
+      transform: translate(22px, -50%);
+    }
+    #cursor-label.show { opacity: 1; }
+    body.overlay-open #cursor { border-color: #1c1c1a; }
+    body.overlay-open #cursor-label { color: #1c1c1a; }
+
+    /* ─── Project overlay ────────────────────── */
+    #project-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: #F0EDE6;
+      color: #1c1c1a;
+      --bg:   #F0EDE6;
+      --fg:   #1c1c1a;
+      --dim:  rgba(28,28,26,0.42);
+      --line: rgba(28,28,26,0.09);
+      transform: translateX(100%);
+      transition: transform .75s cubic-bezier(.77,0,.18,1);
+      overflow-y: auto; overflow-x: hidden;
+    }
+    #project-overlay.open { transform: translateX(0); }
+
+    #overlay-bar {
+      position: sticky; top: 0; left: 0; right: 0; z-index: 2;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 26px 48px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    #overlay-studio {
+      font-family: var(--f-ui); font-size: 10px;
+      letter-spacing: .18em; color: var(--dim); text-transform: uppercase;
+    }
+    #overlay-close-btn {
+      font-family: var(--f-ui); font-size: 10px; letter-spacing: .12em;
+      color: var(--dim); background: none; border: none;
+      cursor: none; text-transform: uppercase; transition: color .3s;
+    }
+    #overlay-close-btn:hover { color: var(--fg); }
+
+    #overlay-intro {
+      display: grid; grid-template-columns: 1.5fr 1fr;
+      min-height: 88svh; align-items: stretch;
+    }
+    #overlay-img-main { position: relative; overflow: hidden; }
+    #overlay-img-main img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    #overlay-meta {
+      padding: 64px 52px 64px;
+      border-left: 1px solid var(--line);
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    #overlay-proj-num {
+      font-size: 10px; letter-spacing: .14em; color: var(--dim); margin-bottom: 20px;
+    }
+    #overlay-proj-title {
+      font-family: var(--f-display);
+      font-size: clamp(18px, 2.2vw, 36px);
+      font-weight: 300; line-height: 1.1; letter-spacing: .06em;
+      margin-bottom: 20px;
+    }
+    #overlay-proj-cats {
+      font-size: 10px; letter-spacing: .12em;
+      color: var(--dim); text-transform: uppercase;
+      line-height: 2; margin-bottom: 48px;
+      border-bottom: 1px solid var(--line); padding-bottom: 40px;
+    }
+    #overlay-proj-desc {
+      font-size: 14px; line-height: 1.95;
+      color: rgba(28,28,26,.68);
+    }
+    #overlay-proj-desc p + p { margin-top: 20px; }
+
+    #overlay-imgs {
+      padding: 0 48px 140px;
+      border-top: 1px solid var(--line);
+    }
+    .ov-sec { padding-top: 64px; }
+    .ov-sec-name {
+      font-family: var(--f-ui);
+      font-size: 10px; letter-spacing: .16em;
+      text-transform: uppercase; color: var(--dim);
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 18px;
+    }
+    .ov-sec-grid {
+      column-count: 3;
+      column-gap: 10px;
+    }
+    .ov-sec-grid img {
+      width: 100%; display: block;
+      margin-bottom: 10px;
+      break-inside: avoid;
+    }
+
+    /* ─── Opener ─────────────────────────────── */
+    #opener {
+      position: fixed; inset: 0; z-index: 500;
+      background: #F0EDE6;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      transition: background 1.2s cubic-bezier(.7,0,.3,1),
+                  opacity    1.2s cubic-bezier(.7,0,.3,1);
+    }
+    #opener.to-dark { background: var(--bg); }
+    #opener.gone    { opacity: 0; pointer-events: none; }
+
+    /* vertically centered row */
+    #opener-mid {
+      display: flex;
+      align-items: center;
+      padding: 0 56px;
+    }
+
+    /* left / image / right as space-between flex */
+    #opener-split {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      opacity: 0;
+      transition: opacity .9s ease;
+    }
+    #opener-split.show { opacity: 1; }
+
+    .op-left  { }
+    .op-right { text-align: right; }
+
+    .op-heading {
+      font-family: var(--f-display);
+      font-size: clamp(15px, 1.9vw, 28px);
+      font-weight: 300;
+      line-height: 1.1;
+      letter-spacing: .02em;
+      color: #1c1c1a;
+      transition: color 1.2s ease;
+    }
+    .op-heading.light { color: var(--fg); }
+
+    .op-sub {
+      font-family: var(--f-ui);
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(28,28,26,.36);
+      margin-top: 10px;
+      transition: color 1.2s ease;
+    }
+    .op-sub.light { color: rgba(28,25,20,.28); }
+
+    /* center NLX image */
+    #reel-wrap {
+      width: clamp(80px, 9vw, 140px);
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+      transition: transform .6s cubic-bezier(.8,0,1,.8),
+                  opacity  .5s ease;
+    }
+    #reel-wrap.close { transform: scale(0); opacity: 0; }
+    #reel-wrap img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+
+    /* body text — bottom, centered */
+    #opener-body {
+      padding: 28px 56px 56px;
+      text-align: center;
+      border-top: 1px solid rgba(28,28,26,.07);
+      opacity: 0;
+      transition: opacity .9s ease .2s;
+    }
+    #opener-body.show { opacity: 1; }
+    #opener-body.fade { opacity: 0; transition: opacity .5s ease; }
+
+    .op-body-text {
+      font-family: var(--f-ui);
+      font-size: 11px;
+      line-height: 1.9;
+      color: rgba(28,28,26,.46);
+      letter-spacing: .02em;
+      max-width: 640px;
+      margin: 0 auto;
+      transition: color 1.2s ease;
+    }
+    .op-body-text.light { color: rgba(28,25,20,.38); }
+
+    /* studio name — centered, appears after reel */
+    #opener-name-group {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex; flex-direction: column; align-items: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+    #opener-name {
+      font-family: var(--f-display);
+      font-size: clamp(18px, 2.6vw, 38px);
+      font-weight: 300;
+      letter-spacing: .1em;
+      white-space: nowrap;
+      color: #1c1c1a;
+      opacity: 0;
+      transition: opacity .8s ease, color 1.2s ease;
+    }
+    #opener-name.show  { opacity: 1; }
+    #opener-name.light { color: var(--fg); }
+    #opener-sub {
+      font-family: var(--f-ui);
+      font-size: clamp(7px, 0.6vw, 9px);
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      color: #1c1c1a;
+      opacity: 0;
+      transition: opacity .8s ease .2s, color 1.2s ease;
+      white-space: nowrap;
+    }
+    #opener-sub.show  { opacity: .5; }
+    #opener-sub.light { color: var(--fg); }
+
+    /* spread row — images fly from center outward */
+    #spread-row {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .sp-item {
+      position: absolute;
+      width: clamp(72px, 8vw, 124px);
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateX(0) scale(.92);
+      transition: transform .9s cubic-bezier(.22,1,.36,1),
+                  opacity  .35s ease;
+    }
+    .sp-item img { width:100%; height:100%; object-fit:cover; display:block; }
+    .sp-item.pop    { opacity:1; transform:translateX(0) scale(1); }
+    .sp-item.spread { opacity:1; transform:translateX(var(--tx)) scale(1); }
+    .sp-item.vanish { opacity:0; transition:opacity .55s ease; }
+
+    /* ─── Navigation ─────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 28px 48px;
+      transition: padding .5s cubic-bezier(.22,1,.36,1),
+                  background .5s ease,
+                  border-color .5s ease;
+    }
+    nav.scrolled {
+      padding: 18px 48px;
+      background: rgba(240,237,230,0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 0.5px solid rgba(28,25,20,0.06);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 9px;
+      color: var(--dim); text-decoration: none;
+      transition: color .3s;
+    }
+    .nav-logo:hover { color: var(--fg); }
+    .dgs-mark { flex-shrink: 0; display: block; }
+    .dgs-wordmark {
+      font-family: var(--f-ui);
+      font-size: 10px; letter-spacing: .18em;
+      text-transform: uppercase;
+      display: block;
+    }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-family: var(--f-ui);
+      font-size: 10px; letter-spacing: .12em;
+      color: var(--dim); text-decoration: none; text-transform: uppercase;
+      transition: color .3s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: -3px; left: 0;
+      width: 0; height: 0.5px;
+      background: var(--fg);
+      transition: width .4s cubic-bezier(.22,1,.36,1);
+    }
+    .nav-links a:hover { color: var(--fg); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* ─── Main wrapper ───────────────────────── */
+    #main {
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+    #main.visible { opacity: 1; }
+
+    /* ─── Shared ─────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity .85s cubic-bezier(.22,1,.36,1),
+                  transform .85s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal.on { opacity: 1; transform: none; }
+
+    .sec-label {
+      font-family: var(--f-ui);
+      font-size: 9px; letter-spacing: .24em;
+      color: var(--dim); text-transform: uppercase;
+      margin-bottom: 44px;
+    }
+    hr.rule { border: none; border-top: 1px solid var(--line); }
+
+    /* ─── Hero ───────────────────────────────── */
+    #hero {
+      min-height: 100svh;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-videos {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .hero-bg-video {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      border: none; outline: none;
+      opacity: 0;
+      transition: opacity 1.8s ease;
+    }
+    .hero-bg-video.active { opacity: 1; }
+    .hero-bg-video.zoom-crop { transform: scale(1.28); }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.42);
+      z-index: 1;
+    }
+    .hero-left {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 48px;
+    }
+    .hero-right { display: none; }
+
+    .hero-sub {
+      font-family: var(--f-ui);
+      font-size: 9px; letter-spacing: .28em;
+      color: rgba(255,255,255,0.5); text-transform: uppercase;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp .8s ease .2s forwards;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } }
+
+    /* ─── Hero collage — float keyframes ───────── */
+    @keyframes float-a {
+      0%,100% { transform:translate3d(0,0,0) rotate(0deg); }
+      33%  { transform:translate3d(10px,-18px,0) rotate(1.8deg); }
+      66%  { transform:translate3d(-12px,10px,0) rotate(-1.2deg); }
+    }
+    @keyframes float-b {
+      0%,100% { transform:translate3d(0,0,0) rotate(0deg); }
+      33%  { transform:translate3d(-14px,12px,0) rotate(-2.1deg); }
+      66%  { transform:translate3d(9px,-14px,0) rotate(1.4deg); }
+    }
+    @keyframes float-c {
+      0%,100% { transform:translate3d(0,0,0) rotate(0deg); }
+      25%  { transform:translate3d(12px,16px,0) rotate(2.4deg); }
+      75%  { transform:translate3d(-14px,-10px,0) rotate(-1.7deg); }
+    }
+    @keyframes float-d {
+      0%,100% { transform:translate3d(0,0,0) rotate(0deg); }
+      40%  { transform:translate3d(-8px,-20px,0) rotate(-2.6deg); }
+      70%  { transform:translate3d(16px,6px,0) rotate(1.9deg); }
+    }
+    @keyframes float-e {
+      0%,100% { transform:translate3d(0,0,0) rotate(0deg); }
+      30%  { transform:translate3d(18px,8px,0) rotate(2.8deg); }
+      60%  { transform:translate3d(-6px,-16px,0) rotate(-1.5deg); }
+    }
+    @keyframes float-f {
+      0%,100% { transform:translate3d(0,0,0) rotate(0deg); }
+      50%  { transform:translate3d(-18px,12px,0) rotate(-3deg); }
+    }
+    @keyframes float-g {
+      0%,100% { transform:translate3d(0,0,0) rotate(0deg); }
+      35%  { transform:translate3d(8px,-14px,0) rotate(1.1deg); }
+      65%  { transform:translate3d(-16px,18px,0) rotate(-2.2deg); }
+    }
+    @keyframes float-h {
+      0%,100% { transform:translate3d(0,0,0) rotate(0deg); }
+      45%  { transform:translate3d(14px,18px,0) rotate(2.5deg); }
+      80%  { transform:translate3d(-10px,-10px,0) rotate(-1.6deg); }
+    }
+
+    /* ─── Collage image item ─────────────────── */
+    .ci {
+      position: absolute;
+      will-change: transform;
+    }
+    .ci-inner {
+      border-radius: 0;
+      overflow: hidden;
+      background: rgba(28,25,20,0.04);
+      scale: 1;
+      filter: brightness(1);
+      transition: scale .45s cubic-bezier(.22,1,.36,1), filter .4s ease;
+      will-change: transform;
+    }
+    .ci:hover { z-index: 100 !important; }
+    .ci:hover .ci-inner {
+      scale: 1.04;
+      filter: brightness(1.06);
+    }
+    .ci img {
+      width: 100%; display: block;
+      object-fit: cover;
+    }
+
+    .hero-right { display: none !important; }
+
+    .hero-hl {
+      font-family: var(--f-display);
+      font-size: clamp(17px, 1.6vw, 24px);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: .06em;
+      overflow: hidden;
+      color: rgba(255,255,255,0.92);
+    }
+    .hero-line {
+      display: block;
+      transform: translateY(110%);
+      opacity: 0;
+      transition: transform 1.5s cubic-bezier(.16,1,.3,1), opacity .8s ease;
+    }
+    .hero-line.on { transform: none; opacity: 1; }
+
+    .hero-meta {
+      display: flex; gap: 56px; flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 64px;
+      opacity: 0;
+      animation: fadeUp .8s ease 1.6s forwards;
+    }
+    .hero-meta-item { display: flex; flex-direction: column; gap: 7px; align-items: center; }
+    .hmeta-label { font-size: 8px; letter-spacing: .22em; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+    .hmeta-val   { font-size: 11px; color: rgba(255,255,255,0.65); font-family: var(--f-display); font-weight: 300; }
+
+
+    /* ─── Statement ──────────────────────────── */
+.statement-body {
+      font-family: var(--f-display);
+      font-size: clamp(22px, 3vw, 44px);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.18;
+      letter-spacing: .03em;
+      text-align: left;
+    }
+    .statement-body + .statement-body { margin-top: 1.2em; }
+    .s-word {
+      display: inline;
+      transition: font-size .7s cubic-bezier(.22,1,.36,1);
+    }
+    .s-word.active { font-size: 1.26em; }
+
+    /* ─── Works ──────────────────────────────── */
+    /* ─── Works ──────────────────────────────── */
+    #works { border-top: 1px solid var(--line); }
+    .works-hd {
+      padding: 110px 48px 100px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .works-hl {
+      font-family: var(--f-display);
+      font-size: clamp(17px, 1.8vw, 26px);
+      font-weight: 300; line-height: 1.25; letter-spacing: .04em;
+    }
+    .works-count { font-size: 10px; color: var(--dim); letter-spacing: .12em; text-transform: uppercase; }
+    .works-grid {
+      display: flex; flex-wrap: wrap;
+      justify-content: center; align-items: flex-start;
+      gap: 96px 56px; padding: 0 48px 160px;
+    }
+    .work-row {
+      flex-shrink: 0; display: flex; flex-direction: column-reverse;
+      text-decoration: none; color: inherit; cursor: none;
+    }
+    .work-row:hover .work-img img { transform: scale(1.06); }
+    .work-img { transition: opacity .55s cubic-bezier(.22,1,.36,1); }
+    .works-grid:has(.work-row:hover) .work-row:not(:hover) .work-img { opacity: .35; }
+    .works-row-break { flex-basis: 100%; height: 0; }
+    .works-grid .work-row:nth-child(1) { width: 23vw; }
+    .works-grid .work-row:nth-child(2) { width: 18vw; }
+    .works-grid .work-row:nth-child(3) { width: 23vw; }
+    .works-grid .work-row:nth-child(5)  { width: 17vw; }
+    .works-grid .work-row:nth-child(6)  { width: 22vw; }
+    .works-grid .work-row:nth-child(7)  { width: 20vw; }
+    .works-grid .work-row:nth-child(9)  { width: 21vw; }
+    .works-grid .work-row:nth-child(10) { width: 25vw; }
+    .works-grid .work-row:nth-child(11) { width: 22vw; }
+    .work-info { padding: 22px 0 0; }
+    .work-num { font-size: 10px; letter-spacing: .14em; color: var(--dim); margin-bottom: 10px; }
+    .work-title {
+      font-family: var(--f-display);
+      font-size: clamp(16px, 1.55vw, 24px);
+      font-weight: 300; line-height: 1.1; letter-spacing: .05em; margin-bottom: 12px;
+      color: rgba(28,25,20,.55);
+      transition: color .5s cubic-bezier(.22,1,.36,1);
+    }
+    .work-row:hover .work-title { color: rgba(28,25,20,1); }
+    .work-cats {
+      font-size: 9px; letter-spacing: .1em; color: rgba(28,25,20,.48); text-transform: uppercase;
+      display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px;
+      transition: color .5s cubic-bezier(.22,1,.36,1);
+    }
+    .work-row:hover .work-cats { color: rgba(28,25,20,.55); }
+    .cat-tag {
+      border: 0.5px solid rgba(28,25,20,0.18); border-radius: 3px;
+      padding: 4px 9px; white-space: nowrap; line-height: 1.8; font-size: 10px;
+      transition: border-color .5s cubic-bezier(.22,1,.36,1);
+    }
+    .work-row:hover .cat-tag { border-color: rgba(28,25,20,.25); }
+    .work-projs { font-size: 10px; letter-spacing: .1em; color: rgba(28,25,20,.45); text-transform: uppercase; margin-top: 8px; transition: color .5s cubic-bezier(.22,1,.36,1); }
+    .work-row:hover .work-projs { color: rgba(28,25,20,.62); }
+    .work-year { margin-top: 10px; font-size: 10px; color: rgba(28,25,20,.45); transition: color .5s cubic-bezier(.22,1,.36,1); }
+    .work-row:hover .work-year { color: rgba(28,25,20,.65); }
+    .work-img { overflow: hidden; position: relative; }
+    .works-grid .work-row:nth-child(1)  .work-img { aspect-ratio: 4/5; }
+    .works-grid .work-row:nth-child(2)  .work-img { aspect-ratio: 4/5; }
+    .works-grid .work-row:nth-child(3)  .work-img { aspect-ratio: 4/5; }
+    .works-grid .work-row:nth-child(5)  .work-img { aspect-ratio: 3/4; }
+    .works-grid .work-row:nth-child(6)  .work-img { aspect-ratio: 4/5; }
+    .works-grid .work-row:nth-child(7)  .work-img { aspect-ratio: 4/5; }
+    .works-grid .work-row:nth-child(9)  .work-img { aspect-ratio: 4/5; }
+    .works-grid .work-row:nth-child(10) .work-img { aspect-ratio: 4/5; }
+    .works-grid .work-row:nth-child(11) .work-img { aspect-ratio: 4/5; }
+    .work-img img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; display: block; opacity: 0;
+      transition: opacity .9s ease, transform 1.8s cubic-bezier(.22,1,.36,1);
+    }
+    .work-img img.active { opacity: 1; }
+
+    /* ─── Founder bridge ───────────────────── */
+    #founder-bridge {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 48px;
+      overflow: hidden;
+      cursor: none;
+    }
+    .fb-text {
+      position: relative;
+      z-index: 1;
+      max-width: 62%;
+    }
+    .fb-eyebrow {
+      font-family: var(--f-ui);
+      font-size: 10px; letter-spacing: .16em;
+      text-transform: uppercase; color: var(--dim);
+      margin-bottom: 44px;
+    }
+    .fb-hl { display: flex; flex-direction: column; gap: 4px; }
+    .fb-line {
+      display: block;
+      font-family: var(--f-display);
+      font-size: clamp(56px, 8.5vw, 128px);
+      font-weight: 300; line-height: .91;
+      letter-spacing: .01em;
+    }
+    .fb-line:nth-child(1) { font-style: italic; }
+    .fb-cta {
+      display: flex; align-items: center; gap: 20px;
+      margin-top: 56px;
+    }
+    .fb-cta-line { width: 56px; height: 0.5px; background: var(--fg); opacity: .3; }
+    .fb-cta-text {
+      font-family: var(--f-ui);
+      font-size: 10px; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--dim);
+    }
+
+    .fb-word-cycle { display: inline-block; transition: opacity .38s ease, transform .38s ease; }
+    .fb-word-cycle.out { opacity: 0; transform: translateY(-16px); }
+    .fb-word-cycle.in  { opacity: 0; transform: translateY(16px); transition: none; }
+
+    /* ─── About ──────────────────────────────── */
+    .about-hl {
+      font-family: var(--f-display);
+      font-size: clamp(22px, 2.8vw, 42px);
+      font-weight: 300; line-height: 1.15;
+      margin-bottom: 48px;
+    }
+    .about-sub {
+      font-size: 9px; letter-spacing: .24em;
+      color: var(--dim); text-transform: uppercase;
+      margin-bottom: 60px;
+    }
+    .about-bio {
+      font-size: 15px; line-height: 1.95;
+      color: rgba(28,25,20,.78);
+    }
+    .about-bio p + p { margin-top: 20px; }
+    .about-bio + .about-bio { margin-top: 40px; }
+
+    .about-type {
+      margin-top: 48px; margin-bottom: 8px;
+      padding: 36px 40px;
+      border-left: 2px solid rgba(28,25,20,.12);
+    }
+    .type-para {
+      font-family: 'Spectral', serif;
+      font-size: 16px;
+      font-weight: 300;
+      font-style: italic;
+      line-height: 2;
+      color: rgba(28,25,20,.78);
+      max-width: 760px;
+      text-align: left;
+      hyphens: auto;
+      -webkit-hyphens: auto;
+    }
+    .type-para + .type-para { margin-top: 0.9em; }
+    .type-cursor-about {
+      display: inline-block;
+      width: 1.5px; height: .75em;
+      background: var(--fg);
+      vertical-align: baseline;
+      margin-left: 2px;
+      animation: blink-about .75s step-end infinite;
+    }
+    @keyframes blink-about { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    .fields { margin-top: 72px; border-top: 1px solid var(--line); padding-top: 52px; display: flex; flex-direction: column; align-items: center; }
+    .fields-row { display: flex; gap: 16px; align-items: stretch; width: 100%; }
+    .field-item {
+      flex: 1;
+      border: 1px solid var(--line);
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .field-item + .field-item { margin-top: 0; }
+    .field-name {
+      font-size: 10px; letter-spacing: .16em;
+      text-transform: uppercase; color: var(--fg);
+      margin-bottom: 12px;
+    }
+    .field-desc {
+      font-family: var(--f-display);
+      font-size: 17px; line-height: 1.75;
+      color: rgba(28,25,20,.58);
+    }
+
+    .type-cursor {
+      display: inline-block;
+      width: 1.5px; height: 1em;
+      background: var(--fg);
+      vertical-align: middle;
+      margin-left: 1px;
+      animation: tcBlink .85s steps(1) infinite;
+    }
+    .type-cursor.fade { animation: none; opacity: 0; transition: opacity 1.5s ease; }
+    @keyframes tcBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ─── Values / Manifesto ─────────────────────── */
+    #values {
+      background: #1C1914;
+      height: 1000vh; /* 10 slides × 100vh — scroll drives the carousel */
+      position: relative;
+      border-top: none;
+    }
+    .ms-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .ms-sphere {
+      position: absolute;
+      right: -28vh;
+      bottom: -22vh;
+      width: 100vh; height: 100vh;
+      pointer-events: none; z-index: 0;
+    }
+    .ms-sphere svg { width: 100%; height: 100%; display: block; }
+    .ms-track {
+      position: relative; z-index: 1;
+      display: flex;
+      height: 100%;
+    }
+    .ms-item {
+      flex: 0 0 100vw;
+      height: 100%;
+      padding: 100px 10vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    /* Nav turns dark inside values */
+    nav.nav-on-dark {
+      background: transparent !important;
+      border-bottom-color: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    nav.nav-on-dark .nav-logo,
+    nav.nav-on-dark .nav-links a {
+      color: rgba(245,243,239,0.48);
+      transition: color .5s ease;
+    }
+    nav.nav-on-dark .nav-logo:hover,
+    nav.nav-on-dark .nav-links a:hover {
+      color: rgba(245,243,239,0.9);
+    }
+    nav.nav-on-dark .nav-links a::after {
+      background: rgba(245,243,239,0.6);
+    }
+    /* Dark entrance veil */
+    #dark-veil {
+      position: fixed;
+      inset: 0;
+      background: #1C1914;
+      pointer-events: none;
+      z-index: 45;
+      opacity: 0;
+      will-change: opacity;
+    }
+    /* Intro slide */
+    .ms-intro { padding: 100px 7vw; }
+    .ms-intro-hl {
+      font-family: var(--f-display);
+      font-size: clamp(30px, 4.8vw, 76px);
+      font-weight: 300; font-style: italic; text-transform: none;
+      line-height: 1.1; letter-spacing: -.01em;
+      color: rgba(238,232,220,0.88); max-width: 80%;
+    }
+    .ms-intro-right {
+      align-self: flex-start; max-width: 380px;
+      text-align: left;
+    }
+    .ms-intro-sub {
+      font-family: var(--f-ui); font-size: 9px;
+      letter-spacing: .16em; text-transform: uppercase;
+      color: rgba(245,243,239,0.72); line-height: 2;
+      text-align: left; margin-bottom: 36px;
+    }
+    .ms-intro-link {
+      font-family: var(--f-ui); font-size: 9px;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: rgba(245,243,239,0.72); text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: color .3s ease; cursor: pointer;
+    }
+    .ms-intro-link:hover { color: rgba(245,243,239,0.75); }
+    /* Principle slides */
+    .ms-num {
+      font-family: var(--f-ui); font-size: 9px; letter-spacing: .22em;
+      color: rgba(245,243,239,0.28); display: block; margin-bottom: 28px;
+      text-transform: uppercase;
+    }
+    .ms-heading {
+      font-family: var(--f-display);
+      font-size: clamp(28px, 4.8vw, 74px);
+      font-weight: 300; font-style: italic; text-transform: none;
+      line-height: 1.08; letter-spacing: -.01em;
+      color: rgba(238,232,220,0.90); max-width: 80%;
+    }
+    .ms-item-right { align-self: flex-end; max-width: 400px; }
+    .ms-body {
+      font-family: var(--f-ui);
+      font-size: clamp(10px, 0.85vw, 12px);
+      letter-spacing: .08em; text-transform: none;
+      color: rgba(235,228,215,0.46); line-height: 2;
+    }
+    .ms-closing .ms-heading { font-size: clamp(32px, 5.5vw, 84px); max-width: 90%; }
+    /* Slide layout helpers */
+    .ms-header-r { align-self: flex-end; text-align: right; }
+    .ms-header-r .ms-heading { text-align: right; max-width: 100%; }
+    .ms-header-r .ms-num    { text-align: right; display: block; }
+    .ms-header-c { align-self: center; text-align: center; }
+    .ms-header-c .ms-heading { text-align: center; max-width: 94%; }
+    .ms-header-c .ms-num    { text-align: center; display: block; }
+    .ms-body-l   { align-self: flex-start; max-width: 420px; }
+    .ms-body-c   { align-self: center; max-width: 540px; text-align: center; }
+    .ms-h-full   { max-width: 100%; font-size: clamp(30px, 5vw, 78px); }
+    /* Italic serif highlight inside body copy */
+    .ms-body em {
+      font-family: var(--f-display);
+      font-style: italic;
+      font-size: 1.28em;
+      color: rgba(245,243,239,0.72);
+      text-transform: none;
+      letter-spacing: .015em;
+      font-weight: 300;
+    }
+    /* Nav */
+    .ms-nav {
+      position: absolute; bottom: 5.5vh; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 8px; z-index: 2; pointer-events: none;
+    }
+    .ms-nav { display: none; }
+    .ms-dot {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: rgba(245,243,239,0.2);
+      transition: background .4s ease, transform .4s ease;
+    }
+    .ms-dot.active { background: rgba(245,243,239,0.8); transform: scale(1.5); }
+    .ms-drag-hint {
+      position: absolute; bottom: 5.5vh; right: 7vw;
+      font-family: var(--f-ui); font-size: 8px;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: rgba(245,243,239,0.28); z-index: 2;
+      display: flex; align-items: center; gap: 12px;
+      transition: opacity 1.4s ease;
+    }
+    .ms-drag-hint.faded { opacity: 0; pointer-events: none; }
+
+    /* ─── Portrait Card ──────────────────────────── */
+    #about {
+      border-top: 1px solid var(--line);
+      padding: 160px max(48px, calc(7vw + 380px)) 160px 48px;
+      max-width: none;
+    }
+    #portrait-card {
+      position: fixed;
+      right: 7vw;
+      top: 50%;
+      width: 300px;
+      height: 400px;
+      perspective: 1400px;
+      cursor: none;
+      filter: drop-shadow(0 18px 48px rgba(0,0,0,0.14));
+      transition: opacity 0.7s ease, filter 0.4s ease;
+      animation: card-float 7s ease-in-out infinite;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 50;
+    }
+    #portrait-card.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #portrait-card.interacting { animation-play-state: paused; }
+    @keyframes card-float {
+      0%,100% { transform: translateY(-50%); }
+      50%      { transform: translateY(calc(-50% - 9px)); }
+    }
+    .pc-inner {
+      position: relative;
+      width: 100%; height: 100%;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+    .pc-face {
+      position: absolute; inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      overflow: hidden;
+    }
+    .pc-front img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center top;
+      display: block;
+    }
+    .pc-light {
+      position: absolute; inset: 0;
+      pointer-events: none; z-index: 1;
+      opacity: 0;
+      transition: opacity .35s ease;
+      mix-blend-mode: soft-light;
+      background: radial-gradient(circle 160px at 50% 50%, rgba(255,255,255,0.28) 0%, transparent 65%);
+    }
+    #portrait-card:hover .pc-light { opacity: 1; }
+    .pc-back {
+      transform: rotateY(180deg);
+      background: #FAF8F4;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .pc-back::-webkit-scrollbar { display: none; }
+    .pc-cv { padding: 32px 28px 36px; }
+    .pc-cv-label {
+      font-family: var(--f-ui); font-size: 7.5px;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: rgba(28,25,20,0.35); margin-bottom: 6px;
+    }
+    .pc-cv-name {
+      font-family: var(--f-display); font-size: 17px;
+      font-weight: 300; letter-spacing: .04em; color: var(--fg);
+    }
+    .pc-cv-divider { height: .5px; background: rgba(28,25,20,0.1); margin: 18px 0; }
+    .pc-cv-section { margin-bottom: 4px; }
+    .pc-cv-section-title {
+      font-family: var(--f-ui); font-size: 7px;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: rgba(28,25,20,0.3); margin-bottom: 12px; font-weight: 400;
+    }
+    .pc-cv-entry {
+      display: grid; grid-template-columns: 32px 1fr;
+      gap: 10px; margin-bottom: 14px;
+    }
+    .pc-cv-year {
+      font-family: var(--f-ui); font-size: 7.5px;
+      letter-spacing: .06em; color: rgba(28,25,20,0.32);
+      padding-top: 2px;
+    }
+    .pc-cv-degree {
+      font-family: var(--f-display); font-size: 10.5px;
+      font-weight: 300; letter-spacing: .02em;
+      color: var(--fg); line-height: 1.4; margin-bottom: 3px;
+    }
+    .pc-cv-institution {
+      font-family: var(--f-ui); font-size: 8px;
+      letter-spacing: .03em; color: rgba(28,25,20,0.45);
+      line-height: 1.55;
+    }
+    .pc-cv-thesis {
+      font-family: var(--f-display); font-size: 8.5px;
+      font-style: italic; color: rgba(28,25,20,0.55);
+      line-height: 1.5; margin: 3px 0;
+    }
+    .pc-cv-note {
+      font-family: var(--f-ui); font-size: 7.5px;
+      letter-spacing: .02em; color: rgba(28,25,20,0.38);
+      line-height: 1.65; margin-top: 4px;
+    }
+    #pc-discover {
+      position: fixed; pointer-events: none; z-index: 200;
+      font-family: var(--f-ui); font-size: 8.5px;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: rgba(255,255,255,0.88); white-space: nowrap;
+      opacity: 0; transition: opacity .35s ease;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+    }
+    #pc-discover.visible { opacity: 1; }
+
+    /* ─── Pre-contact statement ────────────────── */
+    .contact-statement {
+      border-top: 1px solid var(--line);
+      padding: 120px 48px;
+    }
+    .contact-statement .statement-body {
+      max-width: 660px;
+    }
+    .contact-statement .statement-body + .statement-body { margin-top: 1.2em; }
+
+    /* ─── Exhibitions ───────────────────────── */
+    #exhibitions {
+      border-top: 1px solid var(--line);
+      padding: 36px 48px 48px;
+    }
+    .exh-hd {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 24px;
+    }
+    .exh-label {
+      font-family: var(--f-ui);
+      font-size: 9px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+    .exh-footer { padding-top: 28px; display: flex; justify-content: center; }
+    .exh-cv-btn {
+      font-family: var(--f-ui);
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--fg);
+      background: none;
+      border: 1px solid rgba(28,25,20,.3);
+      border-radius: 50%;
+      cursor: pointer;
+      width: 72px;
+      height: 72px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: border-color .25s, background .25s;
+    }
+    .exh-cv-btn:hover { border-color: var(--fg); background: rgba(28,25,20,.04); }
+    .exh-item {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .exh-item:first-child { border-top: 1px solid var(--line); }
+    .exh-year {
+      font-family: var(--f-ui);
+      font-size: 9px;
+      letter-spacing: .08em;
+      color: rgba(28,25,20,.3);
+      padding-top: 2px;
+    }
+    .exh-title {
+      font-family: var(--f-display);
+      font-size: 15px;
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.2;
+      margin-bottom: 3px;
+      color: var(--fg);
+    }
+    .exh-meta {
+      font-family: var(--f-ui);
+      font-size: 9px;
+      letter-spacing: .08em;
+      color: rgba(28,25,20,.35);
+      margin-bottom: 4px;
+    }
+    .exh-desc {
+      font-family: var(--f-ui);
+      font-size: 10px;
+      line-height: 1.75;
+      color: rgba(28,25,20,.4);
+      max-width: 480px;
+    }
+    @media (max-width: 720px) {
+      #exhibitions { padding: 32px 24px 40px; }
+      .exh-item { grid-template-columns: 36px 1fr; gap: 10px; }
+    }
+
+    /* ─── Contact ────────────────────────────── */
+    #contact {
+      background: #1C1914;
+      color: #F0EDE6;
+      border-top: 1px solid rgba(255,255,255,.07);
+      padding: 120px 48px 80px;
+      min-height: 100svh;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      --fg:   #F0EDE6;
+      --dim:  rgba(240,237,230,0.42);
+      --line: rgba(240,237,230,0.07);
+    }
+    .contact-center {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .contact-logo-img {
+      width: clamp(180px, 26vw, 300px);
+      height: auto;
+      display: block;
+      margin: 8px auto;
+      mix-blend-mode: screen;
+      opacity: .72;
+    }
+    .contact-avail {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 10px; letter-spacing: .16em;
+      color: var(--dim); text-transform: uppercase;
+      margin-bottom: 52px;
+    }
+    .avail-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%; background: #72e66a;
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity:1; }
+      50%      { opacity:.35; }
+    }
+    .contact-email {
+      font-family: var(--f-display);
+      font-size: clamp(22px, 3.2vw, 44px);
+      font-weight: 300; font-style: italic;
+      letter-spacing: .01em;
+      color: var(--fg); text-decoration: none;
+      display: inline-block;
+      margin-bottom: 16px;
+      transition: opacity .5s ease;
+    }
+    .contact-email:hover { opacity: .45; }
+    .contact-meta {
+      font-family: var(--f-ui);
+      font-size: 10px; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--dim);
+      margin-bottom: 44px;
+    }
+    .contact-links { display: flex; flex-direction: row; gap: 32px; margin-bottom: 36px; }
+    .clink {
+      font-size: 10px; letter-spacing: .12em;
+      color: var(--dim); text-decoration: none;
+      text-transform: uppercase;
+      display: inline-block;
+      transition: color .35s ease;
+    }
+    .clink:hover { color: var(--fg); }
+    .contact-copy {
+      font-size: 9px; letter-spacing: .10em;
+      color: rgba(240,237,230,.35);
+      text-align: center; line-height: 2;
+    }
+    .contact-legal { margin-top: 8px; display: flex; justify-content: center; gap: 12px; }
+    .contact-legal a { color: rgba(240,237,230,.35); text-decoration: none; transition: color .25s; }
+    .contact-legal a:hover { color: rgba(240,237,230,.7); }
+    .contact-legal span { opacity: .4; }
+
+    /* ─── Characteristics ───────────────────── */
+    #characteristics {
+      border-top: 1px solid var(--line);
+      padding: 52px 48px 0;
+    }
+    .ch-hd {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 24px;
+    }
+    .ch-count {
+      font-family: var(--f-ui);
+      font-size: 10px;
+      letter-spacing: .14em;
+      color: var(--dim);
+    }
+    .ch-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px 16px;
+    }
+    .ch-grid.has-active .ch-item:not(.ch-active) {
+      opacity: .15;
+      transition: opacity .45s cubic-bezier(.22,1,.36,1);
+    }
+    .ch-grid.has-active .ch-item.ch-active {
+      opacity: 1;
+      transition: opacity .45s cubic-bezier(.22,1,.36,1);
+    }
+    .ch-name {
+      display: block;
+      font-family: var(--f-ui);
+      font-size: 9px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--fg);
+      margin-bottom: 3px;
+    }
+    .ch-tag {
+      display: block;
+      font-family: var(--f-display);
+      font-style: italic;
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--dim);
+      margin-bottom: 9px;
+    }
+    .ch-item { border-top: 1px solid var(--line); padding: 20px 0; }
+
+    /* bottom bar */
+    .ch-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 13px 0;
+      border-top: 1px solid var(--line);
+      margin-top: 14px;
+    }
+    .ch-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-shrink: 0;
+    }
+    .ch-bar-star { font-size: 10px; color: var(--dim); }
+    .ch-bar-motto {
+      font-family: var(--f-ui);
+      font-size: 8px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--dim);
+      white-space: nowrap;
+    }
+    .ch-pills { display: flex; gap: 5px; flex-shrink: 0; }
+    .ch-pill {
+      font-family: var(--f-ui);
+      font-size: 8px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--dim);
+      border: 0.5px solid rgba(28,25,20,.18);
+      border-radius: 2px;
+      padding: 5px 9px;
+      background: none;
+      cursor: none;
+      white-space: nowrap;
+      transition: color .3s, border-color .3s, background .3s;
+    }
+    .ch-pill:hover { color: var(--fg); border-color: rgba(28,25,20,.4); }
+    .ch-pill.ch-active { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+    .ch-bar-right {
+      font-family: var(--f-display);
+      font-style: italic;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--dim);
+      text-align: right;
+      flex-shrink: 0;
+      max-width: 200px;
+    }
+    @media (max-width: 1200px) { .ch-bar-right { display: none; } }
+    @media (max-width: 1100px) {
+      .ch-grid { grid-template-columns: repeat(2, 1fr); }
+      .ch-bar-left { display: none; }
+    }
+    @media (max-width: 768px) {
+      #characteristics { padding: 44px 24px 0; }
+      .ch-pills { flex-wrap: wrap; }
+    }
+
+    /* ─── View Transitions ───────────────────── */
+    @view-transition { navigation: auto; }
+    @media (prefers-reduced-motion: no-preference) {
+      ::view-transition-old(root) {
+        animation: vt-out 0.32s cubic-bezier(.22,1,.36,1) both;
+      }
+      ::view-transition-new(root) {
+        animation: vt-in 0.48s cubic-bezier(.22,1,.36,1) both;
+      }
+      @keyframes vt-out { to   { opacity: 0; transform: translateY(-10px) scale(0.98); } }
+      @keyframes vt-in  { from { opacity: 0; transform: translateY(14px); } }
+    }
+
+    /* ─── Responsive ─────────────────────────── */
+    @media (max-width: 1100px) and (min-width: 769px) {
+      .works-grid { gap: 72px 40px; padding: 0 40px 120px; }
+    }
+    @media (max-width: 768px) {
+      nav { padding: 18px 24px; }
+      .nav-links { gap: 18px; }
+      #hero { grid-template-columns: 1fr; min-height: 90svh; }
+      .hero-left { padding: 96px 24px 60px; justify-content: flex-start; }
+      .hero-right { display: none; }
+      .hero-hl { font-size: clamp(28px, 9vw, 44px); }
+      .hero-meta { gap: 28px; margin-top: 52px; }
+      #statement { padding: 80px 24px; }
+      .statement-body { font-size: clamp(18px, 5.5vw, 26px); }
+      .works-hd { padding: 72px 24px 56px; }
+      .works-grid { gap: 56px; padding: 0 24px 100px; }
+      .works-grid .work-row { width: 100% !important; }
+      #founder-bridge { padding: 80px 24px; }
+      .fb-line { font-size: clamp(36px, 10vw, 64px); }
+      #about { padding: 80px 24px; }
+      #portrait-card { display: none; }
+      #values { height: calc(9 * 100svh); }
+      .ms-item { padding: 60px 6vw; }
+      .ms-intro { padding: 60px 6vw; }
+      .ms-intro-hl { font-size: clamp(22px, 6.5vw, 44px); max-width: 100%; }
+      .ms-intro-right { align-self: auto; text-align: left; margin-top: 32px; }
+      .ms-intro-sub { text-align: left; }
+      .ms-heading { font-size: clamp(22px, 6.5vw, 44px); max-width: 100%; }
+      .ms-body { font-size: 11px; }
+      .ms-item-right { align-self: auto; max-width: 100%; margin-top: 24px; }
+      .ms-header-r, .ms-header-c { align-self: auto; text-align: left; }
+      .ms-header-r .ms-heading, .ms-header-c .ms-heading { text-align: left; max-width: 100%; }
+      .ms-header-r .ms-num, .ms-header-c .ms-num { text-align: left; }
+      .ms-body-l, .ms-body-c { align-self: auto; max-width: 100%; text-align: left; margin-top: 24px; }
+      .ms-h-full { font-size: clamp(22px, 6.5vw, 44px); }
+      .ms-drag-hint { display: none; }
+      .contact-statement { padding: 72px 24px; }
+      #contact { padding: 80px 24px 60px; }
+      .contact-email { font-size: clamp(20px, 7vw, 32px); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Cursor + progress -->
+<div id="cursor"></div>
+<div id="cursor-label">Discover</div>
+<div id="scroll-progress"></div>
+
+<!-- Opener veil -->
+<div id="opener">
+
+  <!-- Vertically centered middle row -->
+  <div id="opener-mid">
+    <div id="opener-split">
+
+      <div class="op-left">
+        <h2 class="op-heading" id="op-h-left">Complexity</h2>
+      </div>
+
+      <div id="reel-wrap">
+        <img id="reel-img" src="05_music/The_New_Love_Experience/nlx_02.jpg" alt="">
+      </div>
+
+      <div class="op-right">
+        <h2 class="op-heading" id="op-h-right">&amp; Dedication</h2>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Body text — centered at bottom -->
+  <div id="opener-body">
+    <p class="op-body-text">The work of Dots and Grain Studio is based on an understanding that the human experience and the world I inhabit are a multiverse. I do not reduce them to singular worlds, but embrace their complexity and contradictions.</p>
+  </div>
+
+  <!-- Spread: images fly from center to left + right -->
+  <div id="spread-row">
+    <div class="sp-item" style="--tx:-39vw"><img src="01_editorial/Svea/01/svea_01_02.jpg"></div>
+    <div class="sp-item" style="--tx:-26vw"><img src="04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_05.jpg"></div>
+    <div class="sp-item" style="--tx:-13vw"><img src="09_textile/Embodied/embodied_05.jpg"></div>
+    <div class="sp-item" style="--tx:0vw">  <img src="05_music/The_New_Love_Experience/nlx_13.jpg"></div>
+    <div class="sp-item" style="--tx:13vw"> <img src="03_self-portrait/Metamorphosis/Methamorphosis_1/methamorphosis_1_05.jpg"></div>
+    <div class="sp-item" style="--tx:26vw"> <img src="02_fashion/Taller_de_Vestuario/taller_de_vestuario_08.jpg"></div>
+    <div class="sp-item" style="--tx:39vw"> <img src="08_dance/Metropolitan_Ballet_Botero/botero_08.jpg"></div>
+  </div>
+
+  <!-- Studio name, appears after spread collapses -->
+  <div id="opener-name-group">
+    <div id="opener-name">Dots &amp; Grain Studio</div>
+    <div id="opener-sub">Visual Storytelling</div>
+  </div>
+
+</div>
+
+<!-- Fixed nav (hidden under opener, visible after) -->
+<nav id="nav" style="opacity:0; transition: opacity .8s ease;">
+  <a class="nav-logo" href="#">
+    <svg class="dgs-mark" viewBox="0 0 32 32" width="16" height="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <radialGradient id="dgs-g" cx="45%" cy="80%" r="72%" fx="45%" fy="82%">
+          <stop offset="0%"   stop-color="currentColor" stop-opacity="1"/>
+          <stop offset="38%"  stop-color="currentColor" stop-opacity=".9"/>
+          <stop offset="68%"  stop-color="currentColor" stop-opacity=".4"/>
+          <stop offset="100%" stop-color="currentColor" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="dgs-f" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+          <feTurbulence type="fractalNoise" baseFrequency="0.88" numOctaves="4" seed="7" result="n"/>
+          <feColorMatrix type="matrix"
+            values="0 0 0 0 0
+                    0 0 0 0 0
+                    0 0 0 0 0
+                    0 0 0 18 -9"
+            in="n" result="mask"/>
+          <feComposite in="SourceGraphic" in2="mask" operator="in"/>
+        </filter>
+      </defs>
+      <circle cx="16" cy="16" r="15.5" fill="url(#dgs-g)" filter="url(#dgs-f)"/>
+    </svg>
+    <span class="dgs-wordmark">Dots &amp; Grain Studio</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#founder-bridge">[ About ]</a></li>
+    <li><a href="#works">[ Works ]</a></li>
+    <li><a href="#values">[ Values ]</a></li>
+    <li><a href="#contact">[ Connect ]</a></li>
+  </ul>
+</nav>
+
+<!-- All page content -->
+<div id="main">
+
+  <!-- ── Hero ── -->
+  <section id="hero">
+
+    <!-- Background videos — crossfade via JS -->
+    <div class="hero-videos">
+      <video class="hero-bg-video zoom-crop" data-start="1" data-end="6" autoplay muted playsinline>
+        <source src="08_dance/Metropolitan_Ballet_Botero/BOTERO_S002_S001_T080.mov" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" data-start="224" data-end="239" data-duration="15000" autoplay muted playsinline>
+        <source src="05_music/Laiz/MENA.mp4" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" data-start="134" data-end="146" data-duration="12000" autoplay muted playsinline>
+        <source src="05_music/Laiz/MENA.mp4" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" data-start="0" data-duration="22000" autoplay muted playsinline>
+        <source src="05_music/The_New_Love_Experience/nlx_16.mp4" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" autoplay muted playsinline>
+        <source src="07_makeup/On_Set_Makeup/on_set_01.mp4" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" autoplay muted playsinline>
+        <source src="07_makeup/On_Set_Makeup/on_set_01.mp4" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" data-start="120" autoplay muted playsinline>
+        <source src="04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_02.mp4" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" data-start="170" autoplay muted playsinline>
+        <source src="04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_02.mp4" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" data-start="215" autoplay muted playsinline>
+        <source src="04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_02.mp4" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" data-start="300" autoplay muted playsinline>
+        <source src="04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_02.mp4" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" data-start="32" data-end="44" data-duration="12000" autoplay muted playsinline>
+        <source src="04_theater-costume/Amor_y_otros_Demonios/Sierva.mp4" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" data-start="46" data-end="59" data-duration="13000" autoplay muted playsinline>
+        <source src="04_theater-costume/Amor_y_otros_Demonios/Sierva.mp4" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" data-start="31" autoplay muted playsinline>
+        <source src="05_music/The_New_Love_Experience/nlx_15.mp4" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" data-duration="12000" autoplay muted playsinline>
+        <source src="09_textile/Una_Viaje_Sensorial/Trabajodecampo.mov" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" data-start="14" data-duration="10000" autoplay muted playsinline>
+        <source src="05_music/The_New_Love_Experience/nlx_19.mp4" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" autoplay muted playsinline>
+        <source src="05_music/The_New_Love_Experience/Laiz.mov" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" autoplay muted playsinline>
+        <source src="05_music/The_New_Love_Experience/MATT%20NLE%201.mov" type="video/mp4">
+      </video>
+      <video class="hero-bg-video" autoplay muted playsinline>
+        <source src="05_music/The_New_Love_Experience/Timeline%201.mp4" type="video/mp4">
+      </video>
+    </div>
+
+    <!-- Dark overlay for text legibility -->
+    <div class="hero-overlay"></div>
+
+    <!-- Centered text -->
+    <div class="hero-left">
+      <p class="hero-sub">Performative Arts — Fashion — Music</p>
+      <h1 class="hero-hl" aria-label="We challenge single stories through design interventions.">
+        <span class="hero-line" style="transition-delay:.05s">We challenge</span>
+        <span class="hero-line" style="transition-delay:.22s">single <em>stories</em></span>
+        <span class="hero-line" style="transition-delay:.39s">through design</span>
+        <span class="hero-line" style="transition-delay:.56s">interventions.</span>
+      </h1>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="hmeta-label">Studio</span>
+          <span class="hmeta-val">Dots &amp; Grain Studio</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hmeta-label">Location</span>
+          <span class="hmeta-val">Lower Saxony, Germany</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hmeta-label">Available</span>
+          <span class="hmeta-val">Worldwide</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── Works ── -->
+  <section id="works">
+    <div class="works-hd">
+      <h2 class="works-hl reveal" style="transition-delay:.08s">
+        Every <em>image</em> is a story<br>told against the single version.
+      </h2>
+      <p class="sec-label reveal" style="transition-delay:.16s">Selected Work</p>
+    </div>
+
+    <div class="works-grid">
+
+    <a class="work-row" href="02_fashion/">
+      <div class="work-info reveal">
+        <h3 class="work-title">Fashion</h3>
+        <p class="work-projs">Taller de Vestuario · The Odd Denim</p>
+        <p class="work-year">2023</p>
+      </div>
+      <div class="work-img reveal" style="transition-delay:.15s">
+        <img src="02_fashion/Taller_de_Vestuario/taller_de_vestuario_01.jpg" alt="Fashion" class="active">
+        <img src="02_fashion/Taller_de_Vestuario/taller_de_vestuario_06.jpg" alt="Fashion" loading="lazy">
+        <img src="02_fashion/The_Odd_Denim/odd_denim_01.jpg" alt="Fashion" loading="lazy">
+        <img src="02_fashion/The_Odd_Denim/odd_denim_05.jpg" alt="Fashion" loading="lazy">
+      </div>
+    </a>
+
+    <a class="work-row" href="07_makeup/">
+      <div class="work-info reveal">
+        <h3 class="work-title">Makeup Art</h3>
+        <p class="work-projs">Orchid · Atenea · Behind the scenes</p>
+        <p class="work-year">2024</p>
+      </div>
+      <div class="work-img reveal" style="transition-delay:.15s">
+        <img src="07_makeup/Orchid/orchid_01.jpg" alt="Makeup" class="active">
+        <img src="07_makeup/Orchid/orchid_04.jpg" alt="Makeup" loading="lazy">
+        <img src="07_makeup/Orchid/orchid_07.jpg" alt="Makeup" loading="lazy">
+        <img src="07_makeup/Atenea/atenea_02.jpg" alt="Makeup" loading="lazy">
+        <img src="07_makeup/Deer_in_Headlights/morphstudio_deer_in_headlights_17.jpg" alt="Makeup" loading="lazy">
+      </div>
+    </a>
+
+    <a class="work-row" href="01_editorial/">
+      <div class="work-info reveal">
+        <h3 class="work-title">Editorial</h3>
+        <p class="work-projs">Svea Hauer · Teresa Bartels · Nicoll Gilo</p>
+        <p class="work-year">2024</p>
+      </div>
+      <div class="work-img reveal" style="transition-delay:.15s">
+        <img src="01_editorial/Svea/01/svea_01_01.jpg" alt="Editorial" class="active">
+        <img src="01_editorial/Svea/01/svea_01_04.jpg" alt="Editorial" loading="lazy">
+        <img src="01_editorial/Nicoll_Gilo/nicoll_gilo_01.jpg" alt="Editorial" loading="lazy">
+        <img src="01_editorial/Nicoll_Gilo/nicoll_gilo_05.jpg" alt="Editorial" loading="lazy">
+        <img src="01_editorial/Teresa/teresa_01.jpg" alt="Editorial" loading="lazy">
+      </div>
+    </a>
+
+    <div class="works-row-break"></div>
+
+    <a class="work-row" href="08_dance/">
+      <div class="work-info reveal">
+        <h3 class="work-title">Dance</h3>
+        <p class="work-projs">Metropolitan Ballet — Botero</p>
+        <p class="work-year">2023</p>
+      </div>
+      <div class="work-img reveal" style="transition-delay:.15s">
+        <img src="08_dance/Metropolitan_Ballet_Botero/botero_05.jpg" alt="Dance" class="active">
+        <img src="08_dance/Metropolitan_Ballet_Botero/botero_10.jpg" alt="Dance" loading="lazy">
+        <img src="08_dance/Metropolitan_Ballet_Botero/botero_16.jpg" alt="Dance" loading="lazy">
+        <img src="08_dance/Metropolitan_Ballet_Botero/botero_22.jpg" alt="Dance" loading="lazy">
+      </div>
+    </a>
+
+    <a class="work-row" href="05_music/">
+      <div class="work-info reveal">
+        <h3 class="work-title">Music</h3>
+        <p class="work-projs">The New Love Experience · Levin Kuschel</p>
+        <p class="work-year">2023</p>
+      </div>
+      <div class="work-img reveal" style="transition-delay:.15s">
+        <img src="05_music/The_New_Love_Experience/nlx_02.jpg" alt="Music" class="active">
+        <img src="05_music/The_New_Love_Experience/nlx_13.jpg" alt="Music" loading="lazy">
+      </div>
+    </a>
+
+    <a class="work-row" href="04_theater-costume/">
+      <div class="work-info reveal">
+        <h3 class="work-title">Costume</h3>
+        <p class="work-projs">Amor y otros Demonios · Colombian Power · Sierva María</p>
+        <p class="work-year">2023</p>
+      </div>
+      <div class="work-img reveal" style="transition-delay:.15s">
+        <img src="04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_01.jpg" alt="Theatre" class="active">
+        <img src="04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_06.jpg" alt="Theatre" loading="lazy">
+        <img src="04_theater-costume/Colombian_Power/colombian_power_14.jpg" alt="Theatre" loading="lazy">
+        <img src="04_theater-costume/Colombian_Power/diana_echandia_01.jpg" alt="Theatre" loading="lazy">
+        <img src="04_theater-costume/Sierva_Maria/sierva_maria_01.jpg" alt="Theatre" loading="lazy">
+      </div>
+    </a>
+
+    <div class="works-row-break"></div>
+
+    <a class="work-row" href="06_Illustration/">
+      <div class="work-info reveal">
+        <h3 class="work-title">Illustration</h3>
+        <p class="work-projs">Printmaking · Collective House B</p>
+        <p class="work-year">2024</p>
+      </div>
+      <div class="work-img reveal" style="transition-delay:.15s">
+        <img src="06_Illustration/Printmaking/printmaking_01.jpg" alt="Illustration" class="active">
+        <img src="06_Illustration/Printmaking/printmaking_05.jpg" alt="Illustration" loading="lazy">
+        <img src="06_Illustration/Printmaking/printmaking_10.jpg" alt="Illustration" loading="lazy">
+        <img src="06_Illustration/Collective_House_B/collective_house_b_01.jpg" alt="Illustration" loading="lazy">
+        <img src="06_Illustration/Collective_House_B/collective_house_b_04.jpg" alt="Illustration" loading="lazy">
+      </div>
+    </a>
+
+    <a class="work-row" href="09_textile/">
+      <div class="work-info reveal">
+        <h3 class="work-title">Textile Work</h3>
+        <p class="work-projs">Embodied · Un viaje sensorial</p>
+        <p class="work-year">2025 – 2026</p>
+      </div>
+      <div class="work-img reveal" style="transition-delay:.15s">
+        <img src="09_textile/Embodied/embodied_01.jpg" alt="Textile Work" class="active">
+        <img src="09_textile/Embodied/embodied_04.jpg" alt="Textile Work" loading="lazy">
+        <img src="09_textile/Embodied/embodied_08.jpg" alt="Textile Work" loading="lazy">
+        <img src="09_textile/Una_Viaje_Sensorial/Exhibition/una_viaje_sensorial_01.jpg" alt="Textile Work" loading="lazy">
+        <img src="09_textile/Una_Viaje_Sensorial/Exhibition/una_viaje_sensorial_04.jpg" alt="Textile Work" loading="lazy">
+      </div>
+    </a>
+
+    <a class="work-row" href="03_self-portrait/">
+      <div class="work-info reveal">
+        <h3 class="work-title">Self-Portraiture</h3>
+        <p class="work-projs">Metamorphosis</p>
+        <p class="work-year">2024</p>
+      </div>
+      <div class="work-img reveal" style="transition-delay:.15s">
+        <img src="03_self-portrait/Metamorphosis/Methamorphosis_1/methamorphosis_1_01.jpg" alt="Self Portrait" class="active">
+        <img src="03_self-portrait/Metamorphosis/Methamorphosis_1/methamorphosis_1_04.jpg" alt="Self Portrait" loading="lazy">
+        <img src="03_self-portrait/Metamorphosis/Methamorphosis_1/methamorphosis_1_07.jpg" alt="Self Portrait" loading="lazy">
+        <img src="03_self-portrait/Metamorphosis/Metamorphosis_2/metamorphosis_2_01.jpg" alt="Self Portrait" loading="lazy">
+        <img src="03_self-portrait/Metamorphosis/In Movement/in_movement_01.jpg" alt="Self Portrait" loading="lazy">
+      </div>
+    </a>
+
+    </div><!-- /works-grid -->
+  </section>
+
+  <!-- ── Values ── -->
+  <section id="values">
+  <div class="ms-sticky">
+
+
+    <div class="ms-track" id="ms-track" style="transform:translateX(0)">
+
+      <div class="ms-item ms-intro">
+        <p class="ms-intro-hl">The way I work is as important as the work itself.</p>
+        <div class="ms-intro-right">
+          <p class="ms-intro-sub">These principles guide every collaboration, every conversation, and every creative decision.</p>
+          <a href="#" class="ms-intro-link" id="ms-to-principles">Studio Principles ↘</a>
+        </div>
+      </div>
+
+      <!-- 01 — standard: heading top-left, body bottom-right -->
+      <div class="ms-item">
+        <div>
+          <span class="ms-num">01</span>
+          <h3 class="ms-heading">Concept before<br>aesthetics.</h3>
+        </div>
+        <div class="ms-item-right">
+          <p class="ms-body">Every project begins with a clear idea, thoughtful research, and a strategic framework. <em>Visual form should emerge from meaning</em>—not the other way around.</p>
+        </div>
+      </div>
+
+      <!-- 02 — reversed: heading top-right, body bottom-left -->
+      <div class="ms-item">
+        <div class="ms-header-r">
+          <span class="ms-num">02</span>
+          <h3 class="ms-heading">Connection before<br>representation.</h3>
+        </div>
+        <div class="ms-body-l">
+          <p class="ms-body"><em>Trust, dialogue, and collaboration</em> always come before image-making. I portray only what I can genuinely relate to or have built a meaningful relationship with.</p>
+        </div>
+      </div>
+
+      <!-- 03 — centered: heading and body centered, dramatic statement -->
+      <div class="ms-item">
+        <div class="ms-header-c">
+          <span class="ms-num">03</span>
+          <h3 class="ms-heading"><span style="white-space:nowrap">Some stories</span><br><span style="white-space:nowrap">are not ours</span><br><span style="white-space:nowrap">to tell.</span></h3>
+        </div>
+        <div class="ms-body-c">
+          <p class="ms-body">I respect authorship, lived experience, and the boundaries of representation. <em>Not every perspective should be interpreted by me</em>, and not every story is mine to shape.</p>
+        </div>
+      </div>
+
+      <!-- 04 — full-width heading, body right -->
+      <div class="ms-item">
+        <div>
+          <span class="ms-num">04</span>
+          <h3 class="ms-heading ms-h-full">I do not<br>aestheticize suffering.</h3>
+        </div>
+        <div class="ms-item-right">
+          <p class="ms-body"><em>Pain, trauma, and vulnerability</em> are never treated as visual spectacle. Every story deserves care, nuance, and respect.</p>
+        </div>
+      </div>
+
+      <!-- 05 — heading left, body centered -->
+      <div class="ms-item">
+        <div>
+          <span class="ms-num">05</span>
+          <h3 class="ms-heading">I understand design<br>as a shared resource.</h3>
+        </div>
+        <div class="ms-body-c">
+          <p class="ms-body">I use my skills, platform, and network to support, collaborate with, and <em>create opportunities for others</em> whenever possible.</p>
+        </div>
+      </div>
+
+      <!-- 06 — reversed: heading right, body left -->
+      <div class="ms-item">
+        <div class="ms-header-r">
+          <span class="ms-num">06</span>
+          <h3 class="ms-heading">Empathy is part<br>of the process.</h3>
+        </div>
+        <div class="ms-body-l">
+          <p class="ms-body">Sensitivity, reflection, and active listening guide every stage of my creative practice—<em>from research to execution</em>.</p>
+        </div>
+      </div>
+
+      <!-- 07 — full heading, body right -->
+      <div class="ms-item">
+        <div>
+          <span class="ms-num">07</span>
+          <h3 class="ms-heading ms-h-full">Allyship is an<br>ongoing practice.</h3>
+        </div>
+        <div class="ms-item-right">
+          <p class="ms-body">I strive to create work that respects people, communities, cultures, and the environments in which it exists. <em>Learning, listening, and accountability</em> remain essential parts of my practice.</p>
+        </div>
+      </div>
+
+      <!-- 08 — grand closing: centered, larger -->
+      <div class="ms-item ms-closing">
+        <div class="ms-header-c">
+          <span class="ms-num">08</span>
+          <h3 class="ms-heading"><span style="white-space:nowrap">I encounter</span><br><span style="white-space:nowrap">the world</span><br><span style="white-space:nowrap">with optimism.</span></h3>
+        </div>
+        <div class="ms-body-c">
+          <p class="ms-body">I believe design has the power to challenge assumptions, foster connection, and <em>create space for more thoughtful futures</em>. At the same time, I recognize that meaningful change requires me to set boundaries, make conscious decisions, and act with integrity.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="ms-nav" id="ms-nav">
+      <div class="ms-dot active"></div>
+      <div class="ms-dot"></div>
+      <div class="ms-dot"></div>
+      <div class="ms-dot"></div>
+      <div class="ms-dot"></div>
+      <div class="ms-dot"></div>
+      <div class="ms-dot"></div>
+      <div class="ms-dot"></div>
+      <div class="ms-dot"></div>
+    </div>
+
+    <div class="ms-drag-hint" id="ms-drag-hint">
+      <span>Scroll</span><span>↓</span>
+    </div>
+
+  </div><!-- /.ms-sticky -->
+  </section>
+
+  <!-- ── Characteristics ── -->
+  <section id="characteristics">
+    <div class="ch-hd">
+      <p class="sec-label">I am.</p>
+      <span class="ch-count">07 characteristics</span>
+    </div>
+
+    <div class="ch-grid" id="ch-grid">
+
+      <div class="ch-item reveal" data-ch="questioning">
+        <span class="ch-name">Questioning</span>
+        <span class="ch-tag">Exploring new ways of inhabiting the world.</span>
+      </div>
+
+      <div class="ch-item reveal" data-ch="bold" style="transition-delay:.08s">
+        <span class="ch-name">Bold</span>
+        <span class="ch-tag">Confident, direct and unapologetic.</span>
+      </div>
+
+      <div class="ch-item reveal" data-ch="critical" style="transition-delay:.16s">
+        <span class="ch-name">Critical</span>
+        <span class="ch-tag">Never following without questioning.</span>
+      </div>
+
+      <div class="ch-item reveal" data-ch="attentive" style="transition-delay:.24s">
+        <span class="ch-name">Attentive</span>
+        <span class="ch-tag">Balancing detail with concept, and precision with intuition.</span>
+      </div>
+
+      <div class="ch-item reveal" data-ch="expressive" style="transition-delay:.08s">
+        <span class="ch-name">Expressive</span>
+        <span class="ch-tag">Following intention without holding back.</span>
+      </div>
+
+      <div class="ch-item reveal" data-ch="playful" style="transition-delay:.16s">
+        <span class="ch-name">Playful</span>
+        <span class="ch-tag">Challenging the romance of everyday life.</span>
+      </div>
+
+      <div class="ch-item reveal" data-ch="reflective" style="transition-delay:.24s">
+        <span class="ch-name">Reflective</span>
+        <span class="ch-tag">Sensitive to context and relations.</span>
+      </div>
+
+    </div>
+
+    <div class="ch-bar">
+      <div class="ch-bar-left">
+        <span class="ch-bar-star">✦</span>
+        <span class="ch-bar-motto">Experience the studio differently each time.</span>
+      </div>
+      <div class="ch-pills">
+        <button class="ch-pill" data-ch="questioning">Questioning</button>
+        <button class="ch-pill" data-ch="bold">Bold</button>
+        <button class="ch-pill" data-ch="critical">Critical</button>
+        <button class="ch-pill" data-ch="attentive">Attentive</button>
+        <button class="ch-pill" data-ch="expressive">Expressive</button>
+        <button class="ch-pill" data-ch="playful">Playful</button>
+        <button class="ch-pill" data-ch="reflective">Reflective</button>
+      </div>
+      <p class="ch-bar-right">The energy behind every decision,<br>every image, every collaboration.</p>
+    </div>
+  </section>
+
+  <!-- ── Founder bridge ── -->
+  <section id="founder-bridge">
+    <div class="fb-text">
+      <p class="fb-eyebrow reveal">Based in Lower Saxony, Germany</p>
+      <h2 class="fb-hl">
+        <span class="fb-line reveal" style="transition-delay:.1s">Get to know</span>
+        <span class="fb-line reveal" style="transition-delay:.26s">the <em><span class="fb-word-cycle">Designer.</span></em></span>
+      </h2>
+      <div class="fb-cta reveal" style="transition-delay:.44s">
+        <span class="fb-cta-line"></span>
+        <span class="fb-cta-text">of Dots &amp; Grain</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Portrait card — fixed, visible from founder-bridge through about section -->
+  <div id="portrait-card" role="button" tabindex="0" aria-label="Portrait — click to reveal CV">
+    <div class="pc-inner">
+      <div class="pc-face pc-front">
+        <img src="portrait_02.jpg" alt="Sitadevi Zonneveld">
+        <div class="pc-light"></div>
+      </div>
+      <div class="pc-face pc-back">
+        <div class="pc-cv">
+          <p class="pc-cv-label">Curriculum Vitae</p>
+          <p class="pc-cv-name">Sitadevi Zonneveld</p>
+          <div class="pc-cv-divider"></div>
+          <div class="pc-cv-section">
+            <p class="pc-cv-section-title">Education</p>
+            <div class="pc-cv-entry">
+              <span class="pc-cv-year">2024</span>
+              <div>
+                <p class="pc-cv-degree">Bachelor of Arts in Graphic Design</p>
+                <p class="pc-cv-institution">Hochschule für angewandte Wissenschaft und Kunst Hildesheim</p>
+              </div>
+            </div>
+            <div class="pc-cv-entry">
+              <span class="pc-cv-year">2025</span>
+              <div>
+                <p class="pc-cv-degree">Gap Year in Fashion Design</p>
+                <p class="pc-cv-institution">Universidad Pontificia Bolivariana<br>Medellín, Colombia</p>
+              </div>
+            </div>
+            <div class="pc-cv-entry">
+              <span class="pc-cv-year">2026</span>
+              <div>
+                <p class="pc-cv-degree">Master of Design</p>
+                <p class="pc-cv-institution">Hochschule für angewandte Wissenschaft und Kunst Hildesheim</p>
+              </div>
+            </div>
+          </div>
+          <div class="pc-cv-divider"></div>
+          <div class="pc-cv-section">
+            <p class="pc-cv-section-title">Scholarships &amp; Awards</p>
+            <div class="pc-cv-entry">
+              <span class="pc-cv-year">2024</span>
+              <div>
+                <p class="pc-cv-degree">Alumni DAAD Scholarship</p>
+              </div>
+            </div>
+            <div class="pc-cv-entry">
+              <span class="pc-cv-year">2025</span>
+              <div>
+                <p class="pc-cv-degree">Academic Excellence Award – Art Direction</p>
+                <p class="pc-cv-institution">Universidad Pontificia Bolivariana<br>Medellín, Colombia</p>
+              </div>
+            </div>
+            <div class="pc-cv-entry">
+              <span class="pc-cv-year">2026</span>
+              <div>
+                <p class="pc-cv-degree">Special Recognition for the Bachelor's Thesis</p>
+                <p class="pc-cv-thesis">«Embodied. Dort, wo Leben und Verlust einander begegnen.»</p>
+                <p class="pc-cv-institution">Hochschule für angewandte Wissenschaft und Kunst Hildesheim/Holzminden/Göttingen</p>
+                <p class="pc-cv-note">Artistic research exploring grief and remembrance through embodied practice, textiles, performance, and feminist perspectives.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- ── About ── -->
+  <section id="about">
+    <div class="about-text">
+      <div id="about-type-container"></div>
+    </div>
+  </section>
+
+  <!-- ── Pre-contact statement ── -->
+  <section class="contact-statement">
+    <p class="statement-body reveal">I move between disciplines not out of restlessness — because that's how I understand the world.</p>
+  </section>
+
+  <!-- ── Exhibitions ── -->
+  <section id="exhibitions">
+    <div class="exh-hd">
+      <span class="exh-label">Exhibitions &amp; Publications</span>
+    </div>
+    <div class="exh-list">
+
+      <div class="exh-item reveal">
+        <span class="exh-year">2023</span>
+        <div>
+          <p class="exh-title">Metamorphose</p>
+          <p class="exh-meta">Stammelbachspeicher · Hildesheim, Deutschland</p>
+          <p class="exh-desc">Self-portrait Series</p>
+        </div>
+      </div>
+
+      <div class="exh-item reveal">
+        <span class="exh-year">2025</span>
+        <div>
+          <p class="exh-title">Una Viaje Sensorial</p>
+          <p class="exh-meta">ITM · Medellín, Kolumbien</p>
+          <p class="exh-desc">Book Publication featuring lyrical stories &amp; illustrations from my travel to Colombia. Panel talk at the International School of Design and Creation, Medellín.</p>
+        </div>
+      </div>
+
+      <div class="exh-item reveal">
+        <span class="exh-year">2025</span>
+        <div>
+          <p class="exh-title">Circular</p>
+          <p class="exh-meta">UPB · Medellín, Kolumbien</p>
+          <p class="exh-desc">Sustainable Fashion Design for Urban Mobility. Collection from upcycled materials that enhances safety and visibility in urban spaces. Designed for the District Laureles in Medellín, Colombia, Universidad Pontificia Bolivariana.</p>
+        </div>
+      </div>
+
+      <div class="exh-item reveal">
+        <span class="exh-year">2026</span>
+        <div>
+          <p class="exh-title">Auftakt</p>
+          <p class="exh-meta">Collective Haus B, Kunstraum 53 · Hildesheim</p>
+          <p class="exh-desc">Fine Art Prints Exhibit</p>
+        </div>
+      </div>
+
+      <div class="exh-item reveal">
+        <span class="exh-year">2026</span>
+        <div>
+          <p class="exh-title">Embodied. Where loss and live meet</p>
+          <p class="exh-meta">Handwerksform · Hannover, Deutschland</p>
+        </div>
+      </div>
+
+    </div>
+    <div class="exh-footer">
+      <a class="exh-cv-btn" href="Sitadevi_Zonneveld_CV.pdf" target="_blank" rel="noopener">CV →</a>
+    </div>
+  </section>
+
+  <!-- ── Contact ── -->
+  <section id="contact">
+
+    <div class="contact-center">
+      <div class="contact-avail reveal">
+        <span class="avail-dot"></span>
+        Available for Projects
+      </div>
+      <a class="contact-email reveal" href="mailto:hello@dotsandgrain.studio" style="transition-delay:.1s">
+        hello@dotsandgrain.studio
+      </a>
+      <div class="contact-meta reveal" style="transition-delay:.16s">
+        German · English · Spanish
+      </div>
+      <img class="contact-logo-img reveal" src="logo-weiss.png" alt="Dots & Grain Studio" style="transition-delay:.22s">
+      <div class="contact-links reveal" style="transition-delay:.30s">
+        <a class="clink" href="https://www.instagram.com/sitadevi.z/" target="_blank" rel="noopener">Instagram ↗</a>
+        <a class="clink" href="https://www.linkedin.com/in/sitadevi-zonneveld/" target="_blank" rel="noopener">LinkedIn ↗</a>
+      </div>
+    </div>
+
+    <div class="contact-copy reveal" style="transition-delay:.34s">
+      <p>© 2026 Dots &amp; Grain Studio</p>
+      <p>Sitadevi Zonneveld — Lower Saxony, Germany</p>
+      <p class="contact-legal">
+        <a href="/impressum/">Impressum</a>
+        <span>·</span>
+        <a href="/datenschutz/">Datenschutz</a>
+      </p>
+    </div>
+
+  </section>
+
+</div><!-- /main -->
+
+<!-- Discover cursor label for portrait card -->
+<div id="pc-discover" aria-hidden="true">✦ Discover</div>
+
+<!-- Project overlay -->
+<div id="project-overlay" aria-hidden="true">
+  <div id="overlay-bar">
+    <span id="overlay-studio">Dots &amp; Grain Studio</span>
+    <button id="overlay-close-btn">[ Close ]</button>
+  </div>
+  <div id="overlay-intro">
+    <div id="overlay-img-main">
+      <img id="overlay-hero-img" src="" alt="">
+    </div>
+    <div id="overlay-meta">
+      <h2 id="overlay-proj-title"></h2>
+      <p id="overlay-proj-cats"></p>
+      <div id="overlay-proj-desc"></div>
+    </div>
+  </div>
+  <div id="overlay-imgs"></div>
+</div>
+
+<script>
+  // ── Cursor (smooth lerp)
+  const cur      = document.getElementById('cursor');
+  const curLabel = document.getElementById('cursor-label');
+  let mouseX = 0, mouseY = 0, curX = 0, curY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    curLabel.style.left = mouseX + 'px';
+    curLabel.style.top  = mouseY + 'px';
+  });
+  (function lerpCursor() {
+    curX += (mouseX - curX) * 0.13;
+    curY += (mouseY - curY) * 0.13;
+    cur.style.left = Math.round(curX * 10) / 10 + 'px';
+    cur.style.top  = Math.round(curY * 10) / 10 + 'px';
+    requestAnimationFrame(lerpCursor);
+  })();
+  document.addEventListener('mouseleave', () => cur.classList.add('hidden'));
+  document.addEventListener('mouseenter', () => cur.classList.remove('hidden'));
+  document.querySelectorAll('a:not(.work-row), button').forEach(el => {
+    el.addEventListener('mouseenter', () => cur.classList.add('expand'));
+    el.addEventListener('mouseleave', () => cur.classList.remove('expand'));
+  });
+  document.querySelectorAll('.work-row').forEach(row => {
+    row.addEventListener('mouseenter', () => {
+      curLabel.classList.add('show');
+      cur.classList.add('hidden');
+    });
+    row.addEventListener('mouseleave', () => {
+      curLabel.classList.remove('show');
+      cur.classList.remove('hidden');
+    });
+  });
+
+  // ── Opener sequence
+  const opener     = document.getElementById('opener');
+  const splitEl    = document.getElementById('opener-split');
+  const bodyEl     = document.getElementById('opener-body');
+  const reelWrap   = document.getElementById('reel-wrap');
+  const reelImg    = document.getElementById('reel-img');
+  const openerName = document.getElementById('opener-name');
+  const openerSub  = document.getElementById('opener-sub');
+  const spItems    = Array.from(document.querySelectorAll('.sp-item'));
+  const mainEl     = document.getElementById('main');
+  const navEl      = document.getElementById('nav');
+  const hLines     = document.querySelectorAll('.hero-line');
+
+  // ── Nav dark/light zone tracker (must be declared before any scroll handlers)
+  const _navDarkZones = new Set();
+  function applyNavDark(zone, active) {
+    active ? _navDarkZones.add(zone) : _navDarkZones.delete(zone);
+    navEl.classList.toggle('nav-on-dark', _navDarkZones.size > 0);
+  }
+  // Hero is a dark section → white nav while visible
+  const heroEl2 = document.getElementById('hero');
+  if (heroEl2) {
+    new IntersectionObserver(([e]) => applyNavDark('hero', e.isIntersecting), {
+      rootMargin: '0px 0px -85% 0px',
+      threshold: 0
+    }).observe(heroEl2);
+  }
+  // Contact is a dark section → white nav while visible
+  const contactEl = document.getElementById('contact');
+  if (contactEl) {
+    new IntersectionObserver(([e]) => applyNavDark('contact', e.isIntersecting), {
+      threshold: 0.05
+    }).observe(contactEl);
+  }
+
+  // Preload spread images
+  spItems.forEach(el => { const s = el.querySelector('img').src; new Image().src = s; });
+
+  // NLX images for the reel
+  const reelImages = [
+    '05_music/The_New_Love_Experience/nlx_02.jpg',
+    '05_music/The_New_Love_Experience/nlx_05.jpg',
+    '05_music/The_New_Love_Experience/nlx_09.jpg',
+    '05_music/The_New_Love_Experience/nlx_11.jpg',
+    '05_music/The_New_Love_Experience/nlx_13.jpg',
+    '05_music/The_New_Love_Experience/nlx_17.jpg',
+    '05_music/The_New_Love_Experience/nlx_20.jpg',
+    '05_music/The_New_Love_Experience/nlx_22.jpg',
+    '05_music/The_New_Love_Experience/nlx_25.jpg',
+    '05_music/The_New_Love_Experience/nlx_28.jpg',
+    '05_music/The_New_Love_Experience/nlx_30.jpg',
+    '05_music/Levin_Kuschel/levin_kuschel_02.jpg',
+    '05_music/Levin_Kuschel/levin_kuschel_05.jpg',
+    '05_music/Levin_Kuschel/levin_kuschel_07.jpg',
+  ];
+  reelImages.forEach(src => { new Image().src = src; });
+
+  // Skip opener when navigating back from a project page within the same session
+  if (sessionStorage.getItem('dgs-visited')) {
+    opener.style.display = 'none';
+    document.body.style.overflow = '';
+    navEl.style.opacity = '1';
+    mainEl.classList.add('visible');
+    hLines.forEach(l => l.classList.add('on'));
+  } else {
+    document.body.style.overflow = 'hidden';
+
+    // ① Fade in split layout
+    setTimeout(() => {
+      splitEl.classList.add('show');
+      bodyEl.classList.add('show');
+    }, 300);
+
+    // ② NLX cycling
+    let reelIdx = 0;
+    const reelTimer = setInterval(() => {
+      reelIdx = (reelIdx + 1) % reelImages.length;
+      reelImg.src = reelImages[reelIdx];
+    }, 170);
+
+    // ③ 3s — reel closes, split + body fade, spread items pop in at center
+    setTimeout(() => {
+      clearInterval(reelTimer);
+      reelWrap.classList.add('close');
+      splitEl.style.transition = 'opacity .45s ease';
+      splitEl.style.opacity = '0';
+      bodyEl.classList.add('fade');
+
+      spItems.forEach(el => el.classList.add('pop'));
+
+      // ④ 180ms later — fly outward to their positions
+      setTimeout(() => {
+        spItems.forEach(el => el.classList.replace('pop', 'spread'));
+
+        // ⑤ 1.1s later — spread vanishes
+        setTimeout(() => {
+          spItems.forEach(el => el.classList.add('vanish'));
+
+          // ⑥ 500ms later — studio name on white
+          setTimeout(() => {
+            openerName.classList.add('show');
+            openerSub.classList.add('show');
+
+            // ⑦ 900ms later — flip to dark
+            setTimeout(() => {
+              opener.classList.add('to-dark');
+              openerName.classList.add('light');
+              openerSub.classList.add('light');
+
+              // ⑧ 1.2s later — fade out, reveal portfolio
+              setTimeout(() => {
+                window.scrollTo(0, 0);
+                document.body.style.overflow = '';
+                opener.classList.add('gone');
+                navEl.style.opacity = '1';
+                mainEl.classList.add('visible');
+                sessionStorage.setItem('dgs-visited', '1');
+                setTimeout(() => {
+                  opener.style.display = 'none';
+                  hLines.forEach(l => l.classList.add('on'));
+                }, 1100);
+              }, 1200);
+            }, 900);
+          }, 500);
+        }, 1100);
+      }, 180);
+    }, 3000);
+  }
+
+  // ── Scroll reveal via IntersectionObserver
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('on');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -64px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // ── Hero video crossfade — per-clip start/end via data-start / data-end
+  const bgVideos = Array.from(document.querySelectorAll('.hero-bg-video'));
+  let bgIdx = 0;
+  let rotateTimer = null;
+
+  function clipStart(vid) { return parseFloat(vid.dataset.start ?? 8); }
+  function clipEnd(vid)   { return vid.dataset.end ? parseFloat(vid.dataset.end) : null; }
+
+  function goNextVideo() {
+    clearTimeout(rotateTimer);
+    bgVideos[bgIdx].classList.remove('active');
+    bgIdx = (bgIdx + 1) % bgVideos.length;
+    const next = bgVideos[bgIdx];
+    next.currentTime = clipStart(next);
+    next.play().catch(() => {});
+    next.classList.add('active');
+    const dur = next.dataset.duration ? parseInt(next.dataset.duration) : 7000;
+    rotateTimer = setTimeout(goNextVideo, dur);
+  }
+
+  bgVideos.forEach(vid => {
+    vid.addEventListener('timeupdate', () => {
+      if (!vid.classList.contains('active')) return;
+      const end = clipEnd(vid);
+      const cutAt = end ?? (vid.duration ? Math.max(vid.duration - 8, clipStart(vid) + 1) : Infinity);
+      if (vid.currentTime >= cutAt) goNextVideo();
+    });
+    vid.addEventListener('ended', goNextVideo);
+  });
+
+  // Seek first video to its start point, reveal only after seek is ready
+  const firstVid = bgVideos[0];
+  if (firstVid) {
+    const showFirst = () => {
+      firstVid.currentTime = clipStart(firstVid);
+      firstVid.addEventListener('seeked', () => firstVid.classList.add('active'), { once: true });
+    };
+    firstVid.readyState >= 1 ? showFirst() : firstVid.addEventListener('loadedmetadata', showFirst, { once: true });
+  }
+
+  if (bgVideos.length > 1) rotateTimer = setTimeout(goNextVideo, 14000);
+
+  // ── Scroll-driven: nav state, progress bar
+  const progEl = document.getElementById('scroll-progress');
+
+  window.addEventListener('scroll', () => {
+    const y   = window.scrollY;
+    const tot = document.documentElement.scrollHeight - window.innerHeight;
+    navEl.classList.toggle('scrolled', y > 56);
+    if (progEl && tot > 0) progEl.style.width = (y / tot * 100).toFixed(2) + '%';
+  }, { passive: true });
+
+  // ── Image slideshow — each .work-img cycles its children
+  document.querySelectorAll('.work-img').forEach((container, i) => {
+    const slides = Array.from(container.querySelectorAll('img'));
+    if (slides.length < 2) return;
+    let current = 0;
+    setTimeout(() => {
+      setInterval(() => {
+        slides[current].classList.remove('active');
+        current = (current + 1) % slides.length;
+        slides[current].classList.add('active');
+      }, 3200);
+    }, i * 600);
+  });
+
+  // ── Project overlay
+  const projData = [
+    { desc: '<p>Three editorial series exploring portraiture, mood, and visual narrative — from the intimate to the expressive. A consistent attention to light, timing, and the quiet tension between subject and camera.</p>',
+      sections: [
+        { name: 'Svea', images: ['01_editorial/Svea/01/svea_01_01.jpg','01_editorial/Svea/01/svea_01_02.jpg','01_editorial/Svea/01/svea_01_03.jpg','01_editorial/Svea/01/svea_01_04.jpg','01_editorial/Svea/01/svea_01_05.jpg','01_editorial/Svea/01/svea_01_06.jpg','01_editorial/Svea/01/svea_01_07.jpg','01_editorial/Svea/01/svea_01_08.jpg','01_editorial/Svea/02/svea_02_01.jpg','01_editorial/Svea/02/svea_02_02.jpg','01_editorial/Svea/02/svea_02_03.jpg','01_editorial/Svea/03/svea_03_01.jpg'] },
+        { name: 'Nicoll Gilo', images: ['01_editorial/Nicoll_Gilo/nicoll_gilo_01.jpg','01_editorial/Nicoll_Gilo/nicoll_gilo_02.jpg','01_editorial/Nicoll_Gilo/nicoll_gilo_03.jpg','01_editorial/Nicoll_Gilo/nicoll_gilo_04.jpg','01_editorial/Nicoll_Gilo/nicoll_gilo_05.jpg','01_editorial/Nicoll_Gilo/nicoll_gilo_06.jpg','01_editorial/Nicoll_Gilo/nicoll_gilo_07.jpg','01_editorial/Nicoll_Gilo/nicoll_gilo_08.jpg','01_editorial/Nicoll_Gilo/nicoll_gilo_09.jpg','01_editorial/Nicoll_Gilo/nicoll_gilo_10.jpg','01_editorial/Nicoll_Gilo/nicoll_gilo_11.jpg'] },
+        { name: 'Teresa', images: ['01_editorial/Teresa/teresa_01.jpg','01_editorial/editorial_01.jpg','01_editorial/editorial_02.jpg'] },
+      ]
+    },
+    { desc: '<p>Denim as identity. As rebellion. As rupture. Created in collaboration with Odd Denim District, this editorial explores denim as a symbol of transformation, individuality, and resistance — through sculptural silhouettes, expressive styling, and bold visual compositions.</p><p>A second series for Taller de Vestuario translates the brand\'s values into a coherent visual language, emphasizing form, texture, and the dialogue between garment and body.</p>',
+      sections: [
+        { name: 'Taller de Vestuario', images: ['02_fashion/Taller_de_Vestuario/taller_de_vestuario_01.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_03.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_04.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_05.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_06.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_07.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_08.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_09.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_10.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_11.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_12.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_13.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_14.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_16.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_17.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_18.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_19.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_21.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_22.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_23.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_24.jpg','02_fashion/Taller_de_Vestuario/taller_de_vestuario_25.jpg'] },
+        { name: 'The Odd Denim', images: ['02_fashion/The_Odd_Denim/odd_denim_01.jpg','02_fashion/The_Odd_Denim/odd_denim_02.jpg','02_fashion/The_Odd_Denim/odd_denim_03.jpg','02_fashion/The_Odd_Denim/odd_denim_04.jpg','02_fashion/The_Odd_Denim/odd_denim_05.jpg','02_fashion/The_Odd_Denim/odd_denim_06.jpg','02_fashion/The_Odd_Denim/odd_denim_07.jpg','02_fashion/The_Odd_Denim/odd_denim_08.jpg'] },
+      ]
+    },
+    { desc: '<p>Metamorphose is a personal photographic series exploring vulnerability, self-perception, and transformation — where doubt gradually turns into confidence, and fear opens into courage. Realized in the abandoned theater of Wünsdorf, Germany; a space of memory, silence, and transition.</p>',
+      sections: [
+        { name: 'Metamorphosis I', images: ['03_self-portrait/Metamorphosis/Methamorphosis_1/methamorphosis_1_01.jpg','03_self-portrait/Metamorphosis/Methamorphosis_1/methamorphosis_1_02.jpg','03_self-portrait/Metamorphosis/Methamorphosis_1/methamorphosis_1_03.jpg','03_self-portrait/Metamorphosis/Methamorphosis_1/methamorphosis_1_04.jpg','03_self-portrait/Metamorphosis/Methamorphosis_1/methamorphosis_1_05.jpg','03_self-portrait/Metamorphosis/Methamorphosis_1/methamorphosis_1_06.jpg','03_self-portrait/Metamorphosis/Methamorphosis_1/methamorphosis_1_07.jpg','03_self-portrait/Metamorphosis/Methamorphosis_1/methamorphosis_1_08.jpg'] },
+        { name: 'Metamorphosis II', images: ['03_self-portrait/Metamorphosis/Metamorphosis_2/metamorphosis_2_01.jpg','03_self-portrait/Metamorphosis/Metamorphosis_2/metamorphosis_2_02.jpg'] },
+        { name: 'In Movement', images: ['03_self-portrait/Metamorphosis/In Movement/in_movement_01.jpg','03_self-portrait/Metamorphosis/In Movement/in_movement_02.jpg'] },
+        { name: 'Exhibition', images: ['03_self-portrait/Metamorphosis/Exhibiton/exhibition_01.jpg','03_self-portrait/Metamorphosis/Exhibiton/exhibition_02.jpg'] },
+      ]
+    },
+    { desc: '<p>Del amor y otros demonios is a visual interpretation of Gabriel García Márquez\'s novel, created in Medellín. The project explores the intersections of Latin American colonial history, Catholic symbolism, and African Yoruba traditions through a surreal, painterly visual language.</p><p>Colombian Power, created in Cartagena for designer Diana Echandía, features dancers from El Colegio del Cuerpo in vibrant carnival costumes — celebrating the connection between costume, body, and performance.</p>',
+      sections: [
+        { name: 'Del Amor y otros Demonios', images: ['04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_01.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_03.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_04.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_05.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_06.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_07.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_08.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_09.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_10.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_11.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_12.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_13.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_14.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_15.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_16.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_17.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_18.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_19.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_20.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_21.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_22.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_23.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_24.jpg','04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_25.jpg'] },
+        { name: 'Colombian Power', images: ['04_theater-costume/Colombian_Power/colombian_power_14.jpg','04_theater-costume/Colombian_Power/colombian_power_15.jpg','04_theater-costume/Colombian_Power/colombian_power_16.jpg','04_theater-costume/Colombian_Power/colombian_power_17.jpg','04_theater-costume/Colombian_Power/colombian_power_18.jpg','04_theater-costume/Colombian_Power/colombian_power_19.jpg','04_theater-costume/Colombian_Power/colombian_power_20.jpg','04_theater-costume/Colombian_Power/colombian_power_21.jpg','04_theater-costume/Colombian_Power/diana_echandia_01.jpg','04_theater-costume/Colombian_Power/diana_echandia_02.jpg','04_theater-costume/Colombian_Power/diana_echandia_03.jpg','04_theater-costume/Colombian_Power/diana_echandia_04.jpg','04_theater-costume/Colombian_Power/diana_echandia_05.jpg','04_theater-costume/Colombian_Power/diana_echandia_06.jpg','04_theater-costume/Colombian_Power/diana_echandia_07.jpg','04_theater-costume/Colombian_Power/diana_echandia_08.jpg','04_theater-costume/Colombian_Power/diana_echandia_09.jpg','04_theater-costume/Colombian_Power/diana_echandia_10.jpg','04_theater-costume/Colombian_Power/diana_echandia_11.jpg','04_theater-costume/Colombian_Power/diana_echandia_12.jpg','04_theater-costume/Colombian_Power/diana_echandia_13.jpg','04_theater-costume/Colombian_Power/diana_echandia_14.jpg','04_theater-costume/Colombian_Power/diana_echandia_15.jpg'] },
+        { name: 'Sierva María', images: ['04_theater-costume/Sierva_Maria/sierva_maria_01.jpg','04_theater-costume/Sierva_Maria/sierva_maria_alt_01.jpg','04_theater-costume/Sierva_Maria/sierva_maria_alt_02.jpg','04_theater-costume/Sierva_Maria/sierva_maria_alt_03.jpg','04_theater-costume/Sierva_Maria/sierva_maria_alt_04.jpg','04_theater-costume/Sierva_Maria/sierva_maria_alt_05.jpg'] },
+      ]
+    },
+    { desc: '<p>Music transcends its medium, transforming through the deep connections formed by everyone involved. The New Love Experience × LAIZ is a creative home built by the artists who are part of it — a space of deceleration, trust, and artistic exchange.</p><p>Featuring Pachakuti, Zeyo Mann, Mariama, Leon Raum, and LAIZ. In 2025, Pachakuti was awarded the German Jazz Prize.</p>',
+      sections: [
+        { name: 'The New Love Experience', images: ['05_music/The_New_Love_Experience/nlx_02.jpg','05_music/The_New_Love_Experience/nlx_05.jpg','05_music/The_New_Love_Experience/nlx_06.jpg','05_music/The_New_Love_Experience/nlx_07.jpg','05_music/The_New_Love_Experience/nlx_09.jpg','05_music/The_New_Love_Experience/nlx_10.jpg','05_music/The_New_Love_Experience/nlx_11.jpg','05_music/The_New_Love_Experience/nlx_12.jpg','05_music/The_New_Love_Experience/nlx_13.jpg','05_music/The_New_Love_Experience/nlx_14.jpg','05_music/The_New_Love_Experience/nlx_17.jpg','05_music/The_New_Love_Experience/nlx_18.jpg','05_music/The_New_Love_Experience/nlx_20.jpg','05_music/The_New_Love_Experience/nlx_21.jpg','05_music/The_New_Love_Experience/nlx_22.jpg','05_music/The_New_Love_Experience/nlx_23.jpg','05_music/The_New_Love_Experience/nlx_24.jpg','05_music/The_New_Love_Experience/nlx_25.jpg','05_music/The_New_Love_Experience/nlx_26.jpg','05_music/The_New_Love_Experience/nlx_27.jpg','05_music/The_New_Love_Experience/nlx_28.jpg','05_music/The_New_Love_Experience/nlx_29.jpg','05_music/The_New_Love_Experience/nlx_30.jpg','05_music/The_New_Love_Experience/nlx_31.jpg','05_music/The_New_Love_Experience/nlx_32.jpg','05_music/The_New_Love_Experience/nlx_33.jpg','05_music/The_New_Love_Experience/nlx_34.jpg','05_music/The_New_Love_Experience/nlx_35.jpg'] },
+        { name: 'Levin Kuschel', images: ['05_music/Levin_Kuschel/levin_kuschel_01.jpg','05_music/Levin_Kuschel/levin_kuschel_02.jpg','05_music/Levin_Kuschel/levin_kuschel_03.jpg','05_music/Levin_Kuschel/levin_kuschel_04.jpg','05_music/Levin_Kuschel/levin_kuschel_05.jpg','05_music/Levin_Kuschel/levin_kuschel_06.jpg','05_music/Levin_Kuschel/levin_kuschel_07.jpg','05_music/Levin_Kuschel/levin_kuschel_08.jpg'] },
+      ]
+    },
+    { desc: '<p>Printmaking as resistance. Etching, screen printing, and risography — techniques that push back, where imperfection, dedication, and detail become part of the work. Each print carries the trace of its making.</p>',
+      sections: [
+        { name: 'Printmaking', images: ['06_Illustration/Printmaking/printmaking_01.jpg','06_Illustration/Printmaking/printmaking_02.jpg','06_Illustration/Printmaking/printmaking_03.jpg','06_Illustration/Printmaking/printmaking_04.jpg','06_Illustration/Printmaking/printmaking_05.jpg','06_Illustration/Printmaking/printmaking_07.jpg','06_Illustration/Printmaking/printmaking_08.jpg','06_Illustration/Printmaking/printmaking_09.jpg','06_Illustration/Printmaking/printmaking_10.jpg','06_Illustration/Printmaking/printmaking_11.jpg','06_Illustration/Printmaking/printmaking_12.jpg','06_Illustration/Printmaking/printmaking_13.jpg','06_Illustration/Printmaking/printmaking_14.jpg','06_Illustration/Printmaking/printmaking_15.jpg','06_Illustration/Printmaking/printmaking_16.jpg','06_Illustration/Printmaking/printmaking_17.jpg','06_Illustration/Printmaking/printmaking_18.jpg','06_Illustration/Printmaking/printmaking_19.jpg','06_Illustration/Printmaking/printmaking_20.jpg','06_Illustration/Printmaking/printmaking_21.jpg','06_Illustration/Printmaking/printmaking_22.jpg','06_Illustration/Printmaking/printmaking_23.jpg','06_Illustration/Printmaking/printmaking_24.jpg','06_Illustration/Printmaking/printmaking_25.jpg','06_Illustration/Printmaking/printmaking_26.jpg','06_Illustration/Printmaking/printmaking_27.jpg','06_Illustration/Printmaking/printmaking_28.jpg','06_Illustration/Printmaking/printmaking_29.jpg'] },
+        { name: 'Collective House B', images: ['06_Illustration/Collective_House_B/collective_house_b_01.jpg','06_Illustration/Collective_House_B/collective_house_b_02.jpg','06_Illustration/Collective_House_B/collective_house_b_03.jpg','06_Illustration/Collective_House_B/collective_house_b_04.jpg','06_Illustration/Collective_House_B/collective_house_b_05.jpg','06_Illustration/Collective_House_B/collective_house_b_06.jpg','06_Illustration/Collective_House_B/collective_house_b_07.jpg','06_Illustration/Collective_House_B/collective_house_b_08.jpg'] },
+      ]
+    },
+    { desc: '<p>Atenea is a beauty photography series exploring makeup as precision, refinement, and controlled transformation — focusing on skin, texture, and light. The project approaches beauty through clarity and restraint, where detail becomes the central language.</p>',
+      sections: [
+        { name: 'Orchid', images: ['07_makeup/Orchid/orchid_01.jpg','07_makeup/Orchid/orchid_02.jpg','07_makeup/Orchid/orchid_03.jpg','07_makeup/Orchid/orchid_04.jpg','07_makeup/Orchid/orchid_05.jpg','07_makeup/Orchid/orchid_06.jpg','07_makeup/Orchid/orchid_07.jpg','07_makeup/Orchid/orchid_08.jpg'] },
+        { name: 'Atenea', images: ['07_makeup/Atenea/atenea_02.jpg','07_makeup/Atenea/atenea_03.jpg'] },
+        { name: 'On Set Makeup', images: ['07_makeup/On_Set_Makeup/on_set_02.jpg','07_makeup/On_Set_Makeup/on_set_03.jpg'] },
+      ]
+    },
+    { desc: '<p>Metropolitan Ballet — Botero documents the Metropolitan Ballet of Medellín\'s production inspired by Fernando Botero\'s iconic figures. The series captures the tension between the choreography\'s formal rigor and the expressive, volumetric world of Botero\'s aesthetic.</p>',
+      sections: [
+        { name: 'Metropolitan Ballet — Botero', images: ['08_dance/Metropolitan_Ballet_Botero/botero_01.jpg','08_dance/Metropolitan_Ballet_Botero/botero_02.jpg','08_dance/Metropolitan_Ballet_Botero/botero_03.jpg','08_dance/Metropolitan_Ballet_Botero/botero_04.jpg','08_dance/Metropolitan_Ballet_Botero/botero_05.jpg','08_dance/Metropolitan_Ballet_Botero/botero_06.jpg','08_dance/Metropolitan_Ballet_Botero/botero_07.jpg','08_dance/Metropolitan_Ballet_Botero/botero_08.jpg','08_dance/Metropolitan_Ballet_Botero/botero_09.jpg','08_dance/Metropolitan_Ballet_Botero/botero_10.jpg','08_dance/Metropolitan_Ballet_Botero/botero_11.jpg','08_dance/Metropolitan_Ballet_Botero/botero_12.jpg','08_dance/Metropolitan_Ballet_Botero/botero_13.jpg','08_dance/Metropolitan_Ballet_Botero/botero_14.jpg','08_dance/Metropolitan_Ballet_Botero/botero_15.jpg','08_dance/Metropolitan_Ballet_Botero/botero_16.jpg','08_dance/Metropolitan_Ballet_Botero/botero_17.jpg','08_dance/Metropolitan_Ballet_Botero/botero_18.jpg','08_dance/Metropolitan_Ballet_Botero/botero_19.jpg','08_dance/Metropolitan_Ballet_Botero/botero_20.jpg','08_dance/Metropolitan_Ballet_Botero/botero_21.jpg','08_dance/Metropolitan_Ballet_Botero/botero_22.jpg','08_dance/Metropolitan_Ballet_Botero/botero_23.jpg','08_dance/Metropolitan_Ballet_Botero/botero_24.jpg','08_dance/Metropolitan_Ballet_Botero/botero_25.jpg','08_dance/Metropolitan_Ballet_Botero/botero_26.jpg','08_dance/Metropolitan_Ballet_Botero/botero_27.jpg','08_dance/Metropolitan_Ballet_Botero/botero_28.jpg'] },
+      ]
+    },
+    { desc: '<p>Embodied is a textile installation exploring the relationship between material, body, and memory — tracing connections between personal history, cultural inheritance, and the physical act of making.</p><p>Un viaje sensorial: entre memoria e imagen. Capturar la esencia de un lugar a través de narrativas visuales.</p><p><a href="09_textile/Una_Viaje_Sensorial/ESCUELA_INTERNACIONAL_DE_DISEÑO_Y_CREACIÓN_2025.pdf" target="_blank" rel="noopener" style="color:inherit;letter-spacing:.12em;font-size:10px;text-transform:uppercase;border-bottom:0.5px solid currentColor;padding-bottom:2px;text-decoration:none;opacity:.62;transition:opacity .3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=\'.62\'">ITM — Emociones en lo Cotidiano &rarr;</a></p>',
+      sections: [
+        { name: 'Embodied', images: ['09_textile/Embodied/embodied_01.jpg','09_textile/Embodied/embodied_02.jpg','09_textile/Embodied/embodied_03.jpg','09_textile/Embodied/embodied_04.jpg','09_textile/Embodied/embodied_05.jpg','09_textile/Embodied/embodied_06.jpg','09_textile/Embodied/embodied_07.jpg','09_textile/Embodied/embodied_08.jpg','09_textile/Embodied/embodied_09.jpg','09_textile/Embodied/embodied_10.jpg','09_textile/Embodied/embodied_11.jpg','09_textile/Embodied/embodied_12.jpg','09_textile/Embodied/embodied_13.jpg'] },
+        { name: 'Un viaje sensorial — Exhibition', images: ['09_textile/Una_Viaje_Sensorial/Exhibition/una_viaje_sensorial_01.jpg','09_textile/Una_Viaje_Sensorial/Exhibition/una_viaje_sensorial_02.jpg','09_textile/Una_Viaje_Sensorial/Exhibition/una_viaje_sensorial_03.jpg','09_textile/Una_Viaje_Sensorial/Exhibition/una_viaje_sensorial_04.jpg','09_textile/Una_Viaje_Sensorial/Exhibition/una_viaje_sensorial_05.jpg','09_textile/Una_Viaje_Sensorial/Exhibition/una_viaje_sensorial_06.jpg','09_textile/Una_Viaje_Sensorial/Exhibition/una_viaje_sensorial_07.jpg'] },
+        { name: 'Un viaje sensorial — Viaje del Campo', images: ['09_textile/Una_Viaje_Sensorial/Viaje_del_Campo/una_viaje_sensorial_08.jpg'] },
+      ]
+    },
+  ];
+
+  const projOverlay      = document.getElementById('project-overlay');
+  const overlayHeroImg   = document.getElementById('overlay-hero-img');
+  const overlayProjTitle = document.getElementById('overlay-proj-title');
+  const overlayProjCats  = document.getElementById('overlay-proj-cats');
+  const overlayProjDesc  = document.getElementById('overlay-proj-desc');
+  const overlayImgsEl    = document.getElementById('overlay-imgs');
+
+  // Maps new display order → original projData index
+  // New: Fashion, Makeup, Editorial, Dance, Music, Theatre, Illustration, Textile, Self Portrait
+  const projDataMap = [1, 6, 0, 7, 4, 3, 5, 8, 2];
+
+  function openProject(row, idx) {
+    const d    = projData[projDataMap[idx] ?? idx];
+    const hero = row.querySelector('.work-img img.active') || row.querySelector('.work-img img');
+    overlayHeroImg.src           = hero.src;
+    overlayHeroImg.alt           = row.querySelector('.work-title').textContent;
+    overlayProjTitle.textContent = row.querySelector('.work-title').textContent;
+    overlayProjCats.innerHTML    = row.querySelector('.work-cats').innerHTML +
+      '<br>' + row.querySelector('.work-year').textContent;
+    overlayProjDesc.innerHTML    = d.desc;
+    overlayImgsEl.innerHTML      = d.sections.map(s =>
+      `<div class="ov-sec">
+        <p class="ov-sec-name">${s.name}</p>
+        <div class="ov-sec-grid">${s.images.map(src =>
+          `<img src="${src}" loading="lazy" alt="">`).join('')}
+        </div>
+      </div>`
+    ).join('');
+    projOverlay.classList.add('open');
+    projOverlay.setAttribute('aria-hidden', 'false');
+    projOverlay.scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('overlay-open');
+  }
+
+  function closeOverlay() {
+    projOverlay.classList.remove('open');
+    projOverlay.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    document.body.classList.remove('overlay-open');
+  }
+
+  document.getElementById('overlay-close-btn').addEventListener('click', closeOverlay);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+
+  document.querySelectorAll('.work-row').forEach((row, i) => {
+    row.addEventListener('click', e => { window.location.href = row.getAttribute('href'); });
+  });
+
+
+  // ── About section — full storytelling typing effect ──
+  (function() {
+    const container = document.getElementById('about-type-container');
+    if (!container) return;
+    const paras = [
+      'I left home early to follow my passion. I landed in Hildesheim, where I studied graphic design. Then came Colombia. I went looking for something I couldn\'t name — only to discover that it had been there all along, quietly present. I was walking the same paths my father had travelled thirty years earlier. When I was nine, I danced through the living room with my mother to Shakira, Christina Aguilera and Sade. My parents were singing teachers. They gave me rhythm, curiosity, and a sensitivity to music, art and culture. Our house was always full of friends visiting us from all over the world. I learned to dance with them. With my hips and chest stuffed with balloons, I already thought I was Shakira.',
+      'As a teenager, I started taking dance and singing classes. Then my father died. Silence. The lessons quietly came to an end. But the need to express myself never did. It runs through my veins. It is my fuel. I don\'t belong to just one world — I need more than one door. I move between disciplines, between languages, between cultures and between ways of seeing. The camera became my way in.',
+      'After my father died, the money for lessons was gone. At fourteen, I started working in a bakery. For years, I worked to buy myself a camera. It became my entry ticket into the worlds I cared about — a way of getting close, of looking, of participating. Those worlds became part of me. This is what makes my relationship with the places I enter through the camera so particular. In those moments, I return to my inner child. I remember my father. I become free again — away from the weight that systems and adulthood place on us. I start to dance. I start to feel. I start to express myself through photographs, videos and illustrations. I am drawn to the places where boundaries dissolve — between disciplines, between cultures, between observer and participant, between the personal and the collective. That is where I flourish. Conceptually. Sensitively. Personally.'
+    ];
+    const cursor = document.createElement('span');
+    cursor.className = 'type-cursor-about';
+    let pIdx = 0, cIdx = 0, currentP = null, started = false;
+    function nextPara() {
+      if (currentP) cursor.remove();
+      currentP = document.createElement('p');
+      currentP.className = 'type-para';
+      container.appendChild(currentP);
+      currentP.appendChild(cursor);
+    }
+    function tick() {
+      if (pIdx >= paras.length) { cursor.remove(); return; }
+      if (cIdx < paras[pIdx].length) {
+        const ch = paras[pIdx][cIdx++];
+        currentP.insertBefore(document.createTextNode(ch), cursor);
+        const d = (ch === '.' || ch === '!') ? 55 : ch === ',' ? 28 : 14;
+        setTimeout(tick, d);
+      } else {
+        pIdx++; cIdx = 0;
+        if (pIdx < paras.length) { nextPara(); setTimeout(tick, 400); }
+        else cursor.remove();
+      }
+    }
+    const aboutSec = document.getElementById('about');
+    new IntersectionObserver(([e], obs) => {
+      if (e.isIntersecting && !started) {
+        started = true; obs.disconnect();
+        nextPara(); setTimeout(tick, 300);
+      }
+    }, { threshold: 0.2 }).observe(aboutSec || container);
+  })();
+
+  // ── Founder bridge — word cycle ──
+  (function() {
+    const el = document.querySelector('.fb-word-cycle');
+    if (!el) return;
+    const words = ['Designer.', 'Artist.', 'Photographer.', 'Art Director.', 'Researcher.'];
+    let idx = 0;
+    function next() {
+      el.classList.add('out');
+      setTimeout(() => {
+        idx = (idx + 1) % words.length;
+        el.textContent = words[idx];
+        el.classList.remove('out');
+        el.classList.add('in');
+        requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('in')));
+      }, 380);
+    }
+    setInterval(next, 2600);
+  })();
+
+  // ── Founder bridge — text parallax ──
+  const fBridge = document.getElementById('founder-bridge');
+  if (fBridge) {
+    const fText = fBridge.querySelector('.fb-text');
+    fBridge.addEventListener('mousemove', e => {
+      const r = fBridge.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      fText.style.transform = `translate(${x * -22}px, ${y * -14}px)`;
+    });
+    fBridge.addEventListener('mouseleave', () => {
+      fText.style.transform = '';
+    });
+  }
+
+  // ── Portrait Card ────────────────────────────────────────
+  const portraitCard = document.getElementById('portrait-card');
+  const pcInner      = portraitCard && portraitCard.querySelector('.pc-inner');
+  const pcLight      = portraitCard && portraitCard.querySelector('.pc-light');
+  const pcDiscover   = document.getElementById('pc-discover');
+
+  if (portraitCard && pcInner) {
+    let flipped      = false;
+    let leaveTimer   = null;
+
+    // Cursor label follows mouse globally
+    document.addEventListener('mousemove', e => {
+      if (pcDiscover) {
+        pcDiscover.style.left = (e.clientX + 18) + 'px';
+        pcDiscover.style.top  = (e.clientY + 14) + 'px';
+      }
+    });
+
+    portraitCard.addEventListener('mouseenter', () => {
+      portraitCard.classList.add('interacting');
+      clearTimeout(leaveTimer);
+      if (!flipped && pcDiscover) pcDiscover.classList.add('visible');
+    });
+
+    portraitCard.addEventListener('mousemove', e => {
+      const rect = portraitCard.getBoundingClientRect();
+      const dx   = (e.clientX - rect.left - rect.width  / 2) / (rect.width  / 2);
+      const dy   = (e.clientY - rect.top  - rect.height / 2) / (rect.height / 2);
+
+      if (!flipped) {
+        pcInner.style.transition    = 'transform 0.1s ease';
+        pcInner.style.transform     = `rotateY(${dx * 9}deg) rotateX(${-dy * 6}deg)`;
+        portraitCard.style.filter   = `drop-shadow(${dx * 10}px ${12 + dy * 6}px 40px rgba(0,0,0,0.22))`;
+      }
+
+      if (pcLight) {
+        const lx = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1);
+        const ly = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
+        pcLight.style.background = `radial-gradient(circle 160px at ${lx}% ${ly}%, rgba(255,255,255,0.28) 0%, transparent 65%)`;
+      }
+    });
+
+    portraitCard.addEventListener('mouseleave', () => {
+      if (pcDiscover) pcDiscover.classList.remove('visible');
+
+      if (!flipped) {
+        pcInner.style.transition  = 'transform 0.55s cubic-bezier(.22,1,.36,1)';
+        pcInner.style.transform   = '';
+        portraitCard.style.filter = '';
+        leaveTimer = setTimeout(() => portraitCard.classList.remove('interacting'), 600);
+      } else {
+        leaveTimer = setTimeout(() => flipCard(false), 1000);
+      }
+    });
+
+    portraitCard.addEventListener('click', () => flipCard(!flipped));
+
+    portraitCard.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flipCard(!flipped); }
+    });
+
+    function flipCard(toFlipped) {
+      clearTimeout(leaveTimer);
+      flipped = toFlipped;
+      pcInner.style.transition  = 'transform 0.92s cubic-bezier(.22,1,.36,1)';
+      pcInner.style.transform   = flipped ? 'rotateY(180deg)' : '';
+      portraitCard.style.filter = flipped
+        ? 'drop-shadow(0 24px 56px rgba(0,0,0,0.2))'
+        : '';
+      if (pcDiscover) pcDiscover.classList.toggle('visible', !flipped);
+    }
+
+    // Show portrait from start of #about through end of #exhibitions
+    const founderBridge    = document.getElementById('founder-bridge');
+    const aboutSection     = document.getElementById('about');
+    const exhibitionsSection = document.getElementById('exhibitions');
+
+    function syncPortrait() {
+      if (!aboutSection) return;
+      const aboutTop  = aboutSection.getBoundingClientRect().top;
+      const endEl     = exhibitionsSection || aboutSection;
+      const endBottom = endEl.getBoundingClientRect().bottom;
+      const shouldShow = aboutTop < window.innerHeight * 0.75 && endBottom > 100;
+      portraitCard.classList.toggle('visible', shouldShow);
+    }
+
+    window.addEventListener('scroll', syncPortrait, { passive: true });
+    syncPortrait();
+  }
+
+  // ── Statement word hover (debounced to prevent reflow-loop shaking)
+  document.querySelectorAll('.statement-body').forEach(p => {
+    p.innerHTML = p.textContent.trim().split(/(\s+)/).map(token =>
+      /\S/.test(token) ? `<span class="s-word">${token}</span>` : token
+    ).join('');
+  });
+  document.querySelectorAll('.s-word').forEach(span => {
+    let t;
+    span.addEventListener('mouseenter', () => { clearTimeout(t); span.classList.add('active'); });
+    span.addEventListener('mouseleave', () => { t = setTimeout(() => span.classList.remove('active'), 120); });
+  });
+
+  // ── Manifesto horizontal track
+  const msTrack  = document.getElementById('ms-track');
+  const valuesEl = document.getElementById('values');
+  const msDots   = Array.from(document.querySelectorAll('.ms-dot'));
+  const msDragHint = document.getElementById('ms-drag-hint');
+  let msHintFaded = false;
+
+  // ── Manifesto: scroll-driven sticky carousel
+  if (msTrack && valuesEl) {
+    const msTotal = msTrack.querySelectorAll('.ms-item').length;
+    let snapTimer  = null;
+    let snapping   = false;
+
+    function updateManifesto() {
+      const rect     = valuesEl.getBoundingClientRect();
+      const scrolled = -rect.top;
+      const scrollH  = valuesEl.offsetHeight - window.innerHeight;
+      const progress = Math.max(0, Math.min(1, scrolled / scrollH));
+      const slide    = progress * (msTotal - 1);
+      const tx       = -(slide * 100);
+
+      msTrack.style.transform = `translateX(${tx}vw)`;
+
+      const activeIdx = Math.round(slide);
+      msDots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
+
+      if (!msHintFaded && slide > 0.3) { msHintFaded = true; msDragHint?.classList.add('faded'); }
+
+      const inSection = scrolled > 0 && scrolled < scrollH;
+      applyNavDark('values', inSection);
+
+      // Snap to nearest slide after scroll settles
+      if (!snapping) {
+        clearTimeout(snapTimer);
+        snapTimer = setTimeout(() => {
+          const r2      = valuesEl.getBoundingClientRect();
+          const sc2     = -r2.top;
+          const sH2     = valuesEl.offsetHeight - window.innerHeight;
+          if (sc2 <= 0 || sc2 >= sH2) return;
+          const raw     = (sc2 / sH2) * (msTotal - 1);
+          const target  = Math.round(raw);
+          if (Math.abs(raw - target) < 0.04) return;
+          const targetY = valuesEl.offsetTop + (target / (msTotal - 1)) * sH2;
+          snapping = true;
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+          setTimeout(() => { snapping = false; }, 900);
+        }, 100);
+      }
+    }
+
+    window.addEventListener('scroll', updateManifesto, { passive: true });
+    updateManifesto();
+
+    // "Studio Principles ↘" scrolls into the section (to first principle)
+    document.getElementById('ms-to-principles')?.addEventListener('click', e => {
+      e.preventDefault();
+      const scrollH  = valuesEl.offsetHeight - window.innerHeight;
+      const target   = valuesEl.offsetTop + scrollH / (msTotal - 1); // scroll to slide 1
+      window.scrollTo({ top: target, behavior: 'smooth' });
+    });
+  }
+
+  // ── Characteristics pills — spotlight on click, toggle off on re-click
+  (function() {
+    const grid  = document.getElementById('ch-grid');
+    const items = Array.from(document.querySelectorAll('.ch-item[data-ch]'));
+    document.querySelectorAll('.ch-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const key      = pill.dataset.ch;
+        const wasActive = pill.classList.contains('ch-active');
+        document.querySelectorAll('.ch-pill').forEach(p => p.classList.remove('ch-active'));
+        items.forEach(i => i.classList.remove('ch-active'));
+        grid?.classList.remove('has-active');
+        if (!wasActive) {
+          pill.classList.add('ch-active');
+          grid?.classList.add('has-active');
+          document.querySelector(`.ch-item[data-ch="${key}"]`)?.classList.add('ch-active');
+        }
+      });
+    });
+  })();
+
+  // ── Dark veil — "entering another world" when #values approaches
+  const darkVeil = document.getElementById('dark-veil');
+  if (darkVeil && valuesEl) {
+    const ZONE = window.innerHeight * 0.85; // fade zone: 85vh of scroll travel
+
+    function updateVeil() {
+      const rect = valuesEl.getBoundingClientRect();
+      const vh   = window.innerHeight;
+      let op = 0;
+
+      if (rect.top > vh) {
+        // Approaching from below: build up over ZONE scroll distance
+        op = 1 - Math.min(1, (rect.top - vh) / ZONE);
+      } else if (rect.top >= 0) {
+        // Section rising into view: veil dissolves as dark section reveals
+        op = rect.top / vh;
+      }
+      // Once section is in view or above: no veil (section is already #1C1914)
+
+      darkVeil.style.opacity = Math.max(0, Math.min(0.97, op));
+    }
+
+    window.addEventListener('scroll', updateVeil, { passive: true });
+    updateVeil();
+  }
+</script>
+<div id="dark-veil"></div>
+<script>
+(function(){
+  var sz = 64;
+  var c = document.createElement('canvas');
+  c.width = c.height = sz;
+  var ctx = c.getContext('2d');
+
+  // Build gradient mask on offscreen canvas
+  var m = document.createElement('canvas');
+  m.width = m.height = sz;
+  var mctx = m.getContext('2d');
+  var cx = sz * 0.45, cy = sz * 0.80, r = sz * 0.72;
+  var g = mctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+  g.addColorStop(0,    'rgba(0,0,0,1)');
+  g.addColorStop(0.38, 'rgba(0,0,0,0.9)');
+  g.addColorStop(0.68, 'rgba(0,0,0,0.4)');
+  g.addColorStop(1,    'rgba(0,0,0,0)');
+  mctx.fillStyle = g;
+  mctx.fillRect(0, 0, sz, sz);
+  var mask = mctx.getImageData(0, 0, sz, sz).data;
+
+  // Seeded random
+  var s = 7;
+  function rand(){ s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }
+
+  // Draw dots with probability driven by gradient alpha
+  for(var i = 0; i < 3200; i++){
+    var x = rand() * sz;
+    var y = rand() * sz;
+    var px = (Math.floor(y) * sz + Math.floor(x)) * 4;
+    var a = mask[px + 3] / 255;
+    if(rand() < a){
+      ctx.fillStyle = 'rgba(28,25,20,' + (0.65 + rand() * 0.35) + ')';
+      ctx.beginPath();
+      ctx.arc(x, y, 0.4 + rand() * 0.7, 0, 6.283);
+      ctx.fill();
+    }
+  }
+
+  document.getElementById('dgs-favicon').href = c.toDataURL('image/png');
+})();
+</script>
+</body>
+</html>
