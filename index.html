@@ -6,6 +6,7 @@
   <title>Dots &amp; Grain Studio — Sitadevi Zonneveld</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" id="dgs-favicon" type="image/png" href="favicon.png">
+  <link rel="preload" as="video" href="https://media.dotsngrain.studio/MENA.mp4">
   <meta name="description" content="Challenging single stories through design. Photography, Illustration, Textile, Theater &amp; Costume — Hildesheim / Worldwide." />
 
   <link rel="stylesheet" href="fonts.css">
@@ -51,11 +52,13 @@
       pointer-events: none;
       z-index: 9999;
       transform: translate(-50%, -50%);
-      transition: width .2s, height .2s, border-radius .25s, opacity .3s;
+      transition: width .2s, height .2s, border-radius .25s, opacity .3s, border-color .3s;
       will-change: transform;
     }
     #cursor.expand { width: 42px; height: 42px; border-radius: 50%; }
     #cursor.hidden { opacity: 0; }
+    body.cursor-on-dark #cursor { border-color: rgba(240,237,230,0.7); }
+    body.cursor-on-dark #cursor-label { color: #F0EDE6; }
 
     /* ─── Cursor label ───────────────────────── */
     #cursor-label {
@@ -398,6 +401,7 @@
       position: absolute;
       inset: 0;
       z-index: 0;
+      background: #000;
     }
     .hero-bg-video {
       position: absolute;
@@ -802,6 +806,24 @@
     nav.nav-on-dark .nav-links a:hover {
       color: rgba(245,243,239,0.9);
     }
+    .lang-switcher {
+      display: flex; align-items: center; gap: 5px;
+      margin-left: 28px;
+    }
+    .lang-btn {
+      background: none; border: none; cursor: pointer;
+      font-family: var(--f-ui); font-size: 9px; letter-spacing: .14em;
+      color: var(--dim); padding: 3px 0;
+      transition: color .2s;
+    }
+    .lang-btn:hover { color: var(--fg); }
+    .lang-btn.active { color: var(--fg); }
+    .lang-sep { font-family: var(--f-ui); font-size: 9px; color: var(--dim); opacity: .4; }
+    nav.nav-on-dark .lang-btn { color: rgba(240,237,230,.4); }
+    nav.nav-on-dark .lang-btn:hover,
+    nav.nav-on-dark .lang-btn.active { color: #F0EDE6; }
+    nav.nav-on-dark .lang-sep { color: rgba(240,237,230,.3); }
+
     nav.nav-on-dark .nav-links a::after {
       background: rgba(245,243,239,0.6);
     }
@@ -1116,6 +1138,97 @@
       .exh-item { grid-template-columns: 36px 1fr; gap: 10px; }
     }
 
+    /* ─── Services ──────────────────────────── */
+    #services {
+      padding: 120px 48px 100px;
+      background: #1C1914;
+      color: #F0EDE6;
+      border-top: 1px solid rgba(255,255,255,.07);
+      text-align: center;
+      --fg:   #F0EDE6;
+      --dim:  rgba(240,237,230,0.42);
+      --line: rgba(240,237,230,0.07);
+    }
+    .svc-hd {
+      margin-bottom: 64px;
+    }
+    .svc-label {
+      font-family: var(--f-ui);
+      font-size: 9px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--dim);
+      display: inline-block;
+      border: 1px solid rgba(240,237,230,.2);
+      border-radius: 100px;
+      padding: 5px 14px;
+      margin-bottom: 32px;
+    }
+    .svc-headline {
+      font-family: var(--f-display);
+      font-size: clamp(52px, 9vw, 110px);
+      font-weight: 400;
+      line-height: 0.95;
+      color: var(--fg);
+      margin-bottom: 28px;
+      text-transform: uppercase;
+    }
+    .svc-intro {
+      font-family: var(--f-ui);
+      font-size: 11px;
+      letter-spacing: .06em;
+      line-height: 1.9;
+      color: rgba(240,237,230,.45);
+      max-width: 460px;
+      margin: 0 auto;
+    }
+    .svc-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .svc-item {
+      padding: 48px 40px;
+      border-top: 1px solid var(--line);
+      text-align: center;
+      position: relative;
+    }
+    .svc-item:nth-child(odd) { border-right: 1px solid var(--line); }
+    .svc-num {
+      font-family: var(--f-ui);
+      font-size: 9px;
+      letter-spacing: .12em;
+      color: rgba(240,237,230,.3);
+      display: block;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .svc-name {
+      font-family: var(--f-display);
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 400;
+      line-height: 1.05;
+      margin-bottom: 14px;
+      color: var(--fg);
+    }
+    .svc-tags {
+      font-family: var(--f-ui);
+      font-size: 9px;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      color: rgba(240,237,230,.38);
+      line-height: 1.8;
+    }
+    @media (max-width: 560px) {
+      #services { padding: 80px 24px; }
+      .svc-list { grid-template-columns: 1fr; }
+      .svc-item:nth-child(odd) { border-right: none; }
+      .svc-item { padding: 36px 0; }
+      .svc-name { font-size: 28px; }
+    }
+
     /* ─── Contact ────────────────────────────── */
     #contact {
       background: #1C1914;
@@ -1141,11 +1254,21 @@
       mix-blend-mode: screen;
       opacity: .72;
     }
+    .contact-looking-fwd {
+      font-family: var(--f-display);
+      font-style: italic;
+      font-size: 15px;
+      letter-spacing: .01em;
+      color: rgba(240,237,230,.5);
+      text-align: center;
+      margin-top: 28px;
+      margin-bottom: 56px;
+    }
     .contact-avail {
       display: flex; align-items: center; gap: 10px;
       font-size: 10px; letter-spacing: .16em;
       color: var(--dim); text-transform: uppercase;
-      margin-bottom: 52px;
+      margin-bottom: 0;
     }
     .avail-dot {
       width: 7px; height: 7px;
@@ -1439,11 +1562,19 @@
     <span class="dgs-wordmark">Dots &amp; Grain Studio</span>
   </a>
   <ul class="nav-links">
-    <li><a href="#founder-bridge">[ About ]</a></li>
-    <li><a href="#works">[ Works ]</a></li>
-    <li><a href="#values">[ Values ]</a></li>
-    <li><a href="#contact">[ Connect ]</a></li>
+    <li><a href="#founder-bridge" data-i18n="nav.about">[ About ]</a></li>
+    <li><a href="#works" data-i18n="nav.works">[ Works ]</a></li>
+    <li><a href="#values" data-i18n="nav.values">[ Values ]</a></li>
+    <li><a href="#services" data-i18n="nav.services">[ Services ]</a></li>
+    <li><a href="#contact" data-i18n="nav.connect">[ Connect ]</a></li>
   </ul>
+  <div class="lang-switcher">
+    <button class="lang-btn active" data-lang="en">EN</button>
+    <span class="lang-sep">·</span>
+    <button class="lang-btn" data-lang="de">DE</button>
+    <span class="lang-sep">·</span>
+    <button class="lang-btn" data-lang="es">ES</button>
+  </div>
 </nav>
 
 <!-- All page content -->
@@ -1454,59 +1585,56 @@
 
     <!-- Background videos — crossfade via JS -->
     <div class="hero-videos">
-      <video class="hero-bg-video zoom-crop" data-start="1" data-end="6" autoplay muted playsinline>
-        <source src="08_dance/Metropolitan_Ballet_Botero/BOTERO_S002_S001_T080.mov" type="video/mp4">
-      </video>
-      <video class="hero-bg-video" data-start="224" data-end="239" data-duration="15000" autoplay muted playsinline>
-        <source src="05_music/Laiz/MENA.mp4" type="video/mp4">
+      <video class="hero-bg-video active" data-start="0" data-end="15" data-duration="15000" autoplay muted playsinline preload="auto">
+        <source src="https://media.dotsngrain.studio/MENA.mp4" type="video/mp4">
       </video>
       <video class="hero-bg-video" data-start="134" data-end="146" data-duration="12000" autoplay muted playsinline>
-        <source src="05_music/Laiz/MENA.mp4" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/MENA.mp4" type="video/mp4">
       </video>
       <video class="hero-bg-video" data-start="0" data-duration="22000" autoplay muted playsinline>
-        <source src="05_music/The_New_Love_Experience/nlx_16.mp4" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/nlx_16.mp4" type="video/mp4">
       </video>
       <video class="hero-bg-video" autoplay muted playsinline>
-        <source src="07_makeup/On_Set_Makeup/on_set_01.mp4" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/on_set_01.mp4" type="video/mp4">
       </video>
       <video class="hero-bg-video" autoplay muted playsinline>
-        <source src="07_makeup/On_Set_Makeup/on_set_01.mp4" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/on_set_01.mp4" type="video/mp4">
       </video>
       <video class="hero-bg-video" data-start="120" autoplay muted playsinline>
-        <source src="04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_02.mp4" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/amor_y_otros_demonios_02.mp4" type="video/mp4">
       </video>
       <video class="hero-bg-video" data-start="170" autoplay muted playsinline>
-        <source src="04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_02.mp4" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/amor_y_otros_demonios_02.mp4" type="video/mp4">
       </video>
       <video class="hero-bg-video" data-start="215" autoplay muted playsinline>
-        <source src="04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_02.mp4" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/amor_y_otros_demonios_02.mp4" type="video/mp4">
       </video>
       <video class="hero-bg-video" data-start="300" autoplay muted playsinline>
-        <source src="04_theater-costume/Amor_y_otros_Demonios/amor_y_otros_demonios_02.mp4" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/amor_y_otros_demonios_02.mp4" type="video/mp4">
       </video>
       <video class="hero-bg-video" data-start="32" data-end="44" data-duration="12000" autoplay muted playsinline>
-        <source src="04_theater-costume/Amor_y_otros_Demonios/Sierva.mp4" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/Sierva.mp4" type="video/mp4">
       </video>
       <video class="hero-bg-video" data-start="46" data-end="59" data-duration="13000" autoplay muted playsinline>
-        <source src="04_theater-costume/Amor_y_otros_Demonios/Sierva.mp4" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/Sierva.mp4" type="video/mp4">
       </video>
       <video class="hero-bg-video" data-start="31" autoplay muted playsinline>
-        <source src="05_music/The_New_Love_Experience/nlx_15.mp4" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/nlx_15.mp4" type="video/mp4">
       </video>
       <video class="hero-bg-video" data-duration="12000" autoplay muted playsinline>
-        <source src="09_textile/Una_Viaje_Sensorial/Trabajodecampo.mov" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/Trabajodecampo.mov" type="video/mp4">
       </video>
       <video class="hero-bg-video" data-start="14" data-duration="10000" autoplay muted playsinline>
-        <source src="05_music/The_New_Love_Experience/nlx_19.mp4" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/nlx_19.mp4" type="video/mp4">
       </video>
       <video class="hero-bg-video" autoplay muted playsinline>
-        <source src="05_music/The_New_Love_Experience/Laiz.mov" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/Laiz.mov" type="video/mp4">
       </video>
       <video class="hero-bg-video" autoplay muted playsinline>
-        <source src="05_music/The_New_Love_Experience/MATT%20NLE%201.mov" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/MATT%20NLE%201.mov" type="video/mp4">
       </video>
       <video class="hero-bg-video" autoplay muted playsinline>
-        <source src="05_music/The_New_Love_Experience/Timeline%201.mp4" type="video/mp4">
+        <source src="https://media.dotsngrain.studio/Timeline%201.mp4" type="video/mp4">
       </video>
     </div>
 
@@ -1515,25 +1643,25 @@
 
     <!-- Centered text -->
     <div class="hero-left">
-      <p class="hero-sub">Performative Arts — Fashion — Music</p>
+      <p class="hero-sub" data-i18n="hero.sub">Performative Arts — Fashion — Music</p>
       <h1 class="hero-hl" aria-label="We challenge single stories through design interventions.">
-        <span class="hero-line" style="transition-delay:.05s">We challenge</span>
-        <span class="hero-line" style="transition-delay:.22s">single <em>stories</em></span>
-        <span class="hero-line" style="transition-delay:.39s">through design</span>
-        <span class="hero-line" style="transition-delay:.56s">interventions.</span>
+        <span class="hero-line" style="transition-delay:.05s" data-i18n="hero.l1">We challenge</span>
+        <span class="hero-line" style="transition-delay:.22s"><span data-i18n="hero.l2">single</span> <em data-i18n="hero.l2em">stories</em></span>
+        <span class="hero-line" style="transition-delay:.39s" data-i18n="hero.l3">through design</span>
+        <span class="hero-line" style="transition-delay:.56s" data-i18n="hero.l4">interventions.</span>
       </h1>
       <div class="hero-meta">
         <div class="hero-meta-item">
-          <span class="hmeta-label">Studio</span>
+          <span class="hmeta-label" data-i18n="hero.meta.studio">Studio</span>
           <span class="hmeta-val">Dots &amp; Grain Studio</span>
         </div>
         <div class="hero-meta-item">
-          <span class="hmeta-label">Location</span>
-          <span class="hmeta-val">Lower Saxony, Germany</span>
+          <span class="hmeta-label" data-i18n="hero.meta.location">Location</span>
+          <span class="hmeta-val" data-i18n="hero.meta.locationVal">Lower Saxony, Germany</span>
         </div>
         <div class="hero-meta-item">
-          <span class="hmeta-label">Available</span>
-          <span class="hmeta-val">Worldwide</span>
+          <span class="hmeta-label" data-i18n="hero.meta.available">Available</span>
+          <span class="hmeta-val" data-i18n="hero.meta.availableVal">Worldwide</span>
         </div>
       </div>
     </div>
@@ -1543,17 +1671,17 @@
   <!-- ── Works ── -->
   <section id="works">
     <div class="works-hd">
-      <h2 class="works-hl reveal" style="transition-delay:.08s">
+      <h2 class="works-hl reveal" style="transition-delay:.08s" data-i18n-html="works.hl">
         Every <em>image</em> is a story<br>told against the single version.
       </h2>
-      <p class="sec-label reveal" style="transition-delay:.16s">Selected Work</p>
+      <p class="sec-label reveal" style="transition-delay:.16s" data-i18n="works.label">Selected Work</p>
     </div>
 
     <div class="works-grid">
 
-    <a class="work-row" href="02_fashion/">
+    <a class="work-row" href="02_fashion/index.html">
       <div class="work-info reveal">
-        <h3 class="work-title">Fashion</h3>
+        <h3 class="work-title" data-i18n="wt.fashion">Fashion</h3>
         <p class="work-projs">Taller de Vestuario · The Odd Denim</p>
         <p class="work-year">2023</p>
       </div>
@@ -1565,9 +1693,9 @@
       </div>
     </a>
 
-    <a class="work-row" href="07_makeup/">
+    <a class="work-row" href="07_makeup/index.html">
       <div class="work-info reveal">
-        <h3 class="work-title">Makeup Art</h3>
+        <h3 class="work-title" data-i18n="wt.makeup">Makeup Art</h3>
         <p class="work-projs">Orchid · Atenea · Behind the scenes</p>
         <p class="work-year">2024</p>
       </div>
@@ -1580,9 +1708,9 @@
       </div>
     </a>
 
-    <a class="work-row" href="01_editorial/">
+    <a class="work-row" href="01_editorial/index.html">
       <div class="work-info reveal">
-        <h3 class="work-title">Editorial</h3>
+        <h3 class="work-title" data-i18n="wt.editorial">Editorial</h3>
         <p class="work-projs">Svea Hauer · Teresa Bartels · Nicoll Gilo</p>
         <p class="work-year">2024</p>
       </div>
@@ -1597,9 +1725,9 @@
 
     <div class="works-row-break"></div>
 
-    <a class="work-row" href="08_dance/">
+    <a class="work-row" href="08_dance/index.html">
       <div class="work-info reveal">
-        <h3 class="work-title">Dance</h3>
+        <h3 class="work-title" data-i18n="wt.dance">Dance</h3>
         <p class="work-projs">Metropolitan Ballet — Botero</p>
         <p class="work-year">2023</p>
       </div>
@@ -1611,9 +1739,9 @@
       </div>
     </a>
 
-    <a class="work-row" href="05_music/">
+    <a class="work-row" href="05_music/index.html">
       <div class="work-info reveal">
-        <h3 class="work-title">Music</h3>
+        <h3 class="work-title" data-i18n="wt.music">Music</h3>
         <p class="work-projs">The New Love Experience · Levin Kuschel</p>
         <p class="work-year">2023</p>
       </div>
@@ -1623,9 +1751,9 @@
       </div>
     </a>
 
-    <a class="work-row" href="04_theater-costume/">
+    <a class="work-row" href="04_theater-costume/index.html">
       <div class="work-info reveal">
-        <h3 class="work-title">Costume</h3>
+        <h3 class="work-title" data-i18n="wt.costume">Costume</h3>
         <p class="work-projs">Amor y otros Demonios · Colombian Power · Sierva María</p>
         <p class="work-year">2023</p>
       </div>
@@ -1640,9 +1768,9 @@
 
     <div class="works-row-break"></div>
 
-    <a class="work-row" href="06_Illustration/">
+    <a class="work-row" href="06_Illustration/index.html">
       <div class="work-info reveal">
-        <h3 class="work-title">Illustration</h3>
+        <h3 class="work-title" data-i18n="wt.illustration">Illustration</h3>
         <p class="work-projs">Printmaking · Collective House B</p>
         <p class="work-year">2024</p>
       </div>
@@ -1655,9 +1783,9 @@
       </div>
     </a>
 
-    <a class="work-row" href="09_textile/">
+    <a class="work-row" href="09_textile/index.html">
       <div class="work-info reveal">
-        <h3 class="work-title">Textile Work</h3>
+        <h3 class="work-title" data-i18n="wt.textile">Textile Work</h3>
         <p class="work-projs">Embodied · Un viaje sensorial</p>
         <p class="work-year">2025 – 2026</p>
       </div>
@@ -1670,9 +1798,9 @@
       </div>
     </a>
 
-    <a class="work-row" href="03_self-portrait/">
+    <a class="work-row" href="03_self-portrait/index.html">
       <div class="work-info reveal">
-        <h3 class="work-title">Self-Portraiture</h3>
+        <h3 class="work-title" data-i18n="wt.selfportrait">Self-Portraiture</h3>
         <p class="work-projs">Metamorphosis</p>
         <p class="work-year">2024</p>
       </div>
@@ -1696,10 +1824,10 @@
     <div class="ms-track" id="ms-track" style="transform:translateX(0)">
 
       <div class="ms-item ms-intro">
-        <p class="ms-intro-hl">The way I work is as important as the work itself.</p>
+        <p class="ms-intro-hl" data-i18n="values.intro.hl">The way I work is as important as the work itself.</p>
         <div class="ms-intro-right">
-          <p class="ms-intro-sub">These principles guide every collaboration, every conversation, and every creative decision.</p>
-          <a href="#" class="ms-intro-link" id="ms-to-principles">Studio Principles ↘</a>
+          <p class="ms-intro-sub" data-i18n="values.intro.sub">These principles guide every collaboration, every conversation, and every creative decision.</p>
+          <a href="#" class="ms-intro-link" id="ms-to-principles" data-i18n="values.intro.link">Studio Principles ↘</a>
         </div>
       </div>
 
@@ -1707,10 +1835,10 @@
       <div class="ms-item">
         <div>
           <span class="ms-num">01</span>
-          <h3 class="ms-heading">Concept before<br>aesthetics.</h3>
+          <h3 class="ms-heading" data-i18n-html="values.v1.h">Concept before<br>aesthetics.</h3>
         </div>
         <div class="ms-item-right">
-          <p class="ms-body">Every project begins with a clear idea, thoughtful research, and a strategic framework. <em>Visual form should emerge from meaning</em>—not the other way around.</p>
+          <p class="ms-body" data-i18n-html="values.v1.b">Every project begins with a clear idea, thoughtful research, and a strategic framework. <em>Visual form should emerge from meaning</em>—not the other way around.</p>
         </div>
       </div>
 
@@ -1718,10 +1846,10 @@
       <div class="ms-item">
         <div class="ms-header-r">
           <span class="ms-num">02</span>
-          <h3 class="ms-heading">Connection before<br>representation.</h3>
+          <h3 class="ms-heading" data-i18n-html="values.v2.h">Connection before<br>representation.</h3>
         </div>
         <div class="ms-body-l">
-          <p class="ms-body"><em>Trust, dialogue, and collaboration</em> always come before image-making. I portray only what I can genuinely relate to or have built a meaningful relationship with.</p>
+          <p class="ms-body" data-i18n-html="values.v2.b"><em>Trust, dialogue, and collaboration</em> always come before image-making. I portray only what I can genuinely relate to or have built a meaningful relationship with.</p>
         </div>
       </div>
 
@@ -1729,10 +1857,10 @@
       <div class="ms-item">
         <div class="ms-header-c">
           <span class="ms-num">03</span>
-          <h3 class="ms-heading"><span style="white-space:nowrap">Some stories</span><br><span style="white-space:nowrap">are not ours</span><br><span style="white-space:nowrap">to tell.</span></h3>
+          <h3 class="ms-heading" data-i18n-html="values.v3.h"><span style="white-space:nowrap">Some stories</span><br><span style="white-space:nowrap">are not ours</span><br><span style="white-space:nowrap">to tell.</span></h3>
         </div>
         <div class="ms-body-c">
-          <p class="ms-body">I respect authorship, lived experience, and the boundaries of representation. <em>Not every perspective should be interpreted by me</em>, and not every story is mine to shape.</p>
+          <p class="ms-body" data-i18n-html="values.v3.b">I respect authorship, lived experience, and the boundaries of representation. <em>Not every perspective should be interpreted by me</em>, and not every story is mine to shape.</p>
         </div>
       </div>
 
@@ -1740,10 +1868,10 @@
       <div class="ms-item">
         <div>
           <span class="ms-num">04</span>
-          <h3 class="ms-heading ms-h-full">I do not<br>aestheticize suffering.</h3>
+          <h3 class="ms-heading ms-h-full" data-i18n-html="values.v4.h">I do not<br>aestheticize suffering.</h3>
         </div>
         <div class="ms-item-right">
-          <p class="ms-body"><em>Pain, trauma, and vulnerability</em> are never treated as visual spectacle. Every story deserves care, nuance, and respect.</p>
+          <p class="ms-body" data-i18n-html="values.v4.b"><em>Pain, trauma, and vulnerability</em> are never treated as visual spectacle. Every story deserves care, nuance, and respect.</p>
         </div>
       </div>
 
@@ -1751,10 +1879,10 @@
       <div class="ms-item">
         <div>
           <span class="ms-num">05</span>
-          <h3 class="ms-heading">I understand design<br>as a shared resource.</h3>
+          <h3 class="ms-heading" data-i18n-html="values.v5.h">I understand design<br>as a shared resource.</h3>
         </div>
         <div class="ms-body-c">
-          <p class="ms-body">I use my skills, platform, and network to support, collaborate with, and <em>create opportunities for others</em> whenever possible.</p>
+          <p class="ms-body" data-i18n-html="values.v5.b">I use my skills, platform, and network to support, collaborate with, and <em>create opportunities for others</em> whenever possible.</p>
         </div>
       </div>
 
@@ -1762,10 +1890,10 @@
       <div class="ms-item">
         <div class="ms-header-r">
           <span class="ms-num">06</span>
-          <h3 class="ms-heading">Empathy is part<br>of the process.</h3>
+          <h3 class="ms-heading" data-i18n-html="values.v6.h">Empathy is part<br>of the process.</h3>
         </div>
         <div class="ms-body-l">
-          <p class="ms-body">Sensitivity, reflection, and active listening guide every stage of my creative practice—<em>from research to execution</em>.</p>
+          <p class="ms-body" data-i18n-html="values.v6.b">Sensitivity, reflection, and active listening guide every stage of my creative practice—<em>from research to execution</em>.</p>
         </div>
       </div>
 
@@ -1773,10 +1901,10 @@
       <div class="ms-item">
         <div>
           <span class="ms-num">07</span>
-          <h3 class="ms-heading ms-h-full">Allyship is an<br>ongoing practice.</h3>
+          <h3 class="ms-heading ms-h-full" data-i18n-html="values.v7.h">Allyship is an<br>ongoing practice.</h3>
         </div>
         <div class="ms-item-right">
-          <p class="ms-body">I strive to create work that respects people, communities, cultures, and the environments in which it exists. <em>Learning, listening, and accountability</em> remain essential parts of my practice.</p>
+          <p class="ms-body" data-i18n-html="values.v7.b">I strive to create work that respects people, communities, cultures, and the environments in which it exists. <em>Learning, listening, and accountability</em> remain essential parts of my practice.</p>
         </div>
       </div>
 
@@ -1784,10 +1912,10 @@
       <div class="ms-item ms-closing">
         <div class="ms-header-c">
           <span class="ms-num">08</span>
-          <h3 class="ms-heading"><span style="white-space:nowrap">I encounter</span><br><span style="white-space:nowrap">the world</span><br><span style="white-space:nowrap">with optimism.</span></h3>
+          <h3 class="ms-heading" data-i18n-html="values.v8.h"><span style="white-space:nowrap">I encounter</span><br><span style="white-space:nowrap">the world</span><br><span style="white-space:nowrap">with optimism.</span></h3>
         </div>
         <div class="ms-body-c">
-          <p class="ms-body">I believe design has the power to challenge assumptions, foster connection, and <em>create space for more thoughtful futures</em>. At the same time, I recognize that meaningful change requires me to set boundaries, make conscious decisions, and act with integrity.</p>
+          <p class="ms-body" data-i18n-html="values.v8.b">I believe design has the power to challenge assumptions, foster connection, and <em>create space for more thoughtful futures</em>. At the same time, I recognize that meaningful change requires me to set boundaries, make conscious decisions, and act with integrity.</p>
         </div>
       </div>
 
@@ -1815,45 +1943,45 @@
   <!-- ── Characteristics ── -->
   <section id="characteristics">
     <div class="ch-hd">
-      <p class="sec-label">I am.</p>
-      <span class="ch-count">07 characteristics</span>
+      <p class="sec-label" data-i18n="chars.label">I am.</p>
+      <span class="ch-count" data-i18n="chars.count">07 characteristics</span>
     </div>
 
     <div class="ch-grid" id="ch-grid">
 
       <div class="ch-item reveal" data-ch="questioning">
-        <span class="ch-name">Questioning</span>
-        <span class="ch-tag">Exploring new ways of inhabiting the world.</span>
+        <span class="ch-name" data-i18n="chars.questioning.name">Questioning</span>
+        <span class="ch-tag" data-i18n="chars.questioning.tag">Exploring new ways of inhabiting the world.</span>
       </div>
 
       <div class="ch-item reveal" data-ch="bold" style="transition-delay:.08s">
-        <span class="ch-name">Bold</span>
-        <span class="ch-tag">Confident, direct and unapologetic.</span>
+        <span class="ch-name" data-i18n="chars.bold.name">Bold</span>
+        <span class="ch-tag" data-i18n="chars.bold.tag">Confident, direct and unapologetic.</span>
       </div>
 
       <div class="ch-item reveal" data-ch="critical" style="transition-delay:.16s">
-        <span class="ch-name">Critical</span>
-        <span class="ch-tag">Never following without questioning.</span>
+        <span class="ch-name" data-i18n="chars.critical.name">Critical</span>
+        <span class="ch-tag" data-i18n="chars.critical.tag">Never following without questioning.</span>
       </div>
 
       <div class="ch-item reveal" data-ch="attentive" style="transition-delay:.24s">
-        <span class="ch-name">Attentive</span>
-        <span class="ch-tag">Balancing detail with concept, and precision with intuition.</span>
+        <span class="ch-name" data-i18n="chars.attentive.name">Attentive</span>
+        <span class="ch-tag" data-i18n="chars.attentive.tag">Balancing detail with concept, and precision with intuition.</span>
       </div>
 
       <div class="ch-item reveal" data-ch="expressive" style="transition-delay:.08s">
-        <span class="ch-name">Expressive</span>
-        <span class="ch-tag">Following intention without holding back.</span>
+        <span class="ch-name" data-i18n="chars.expressive.name">Expressive</span>
+        <span class="ch-tag" data-i18n="chars.expressive.tag">Following intention without holding back.</span>
       </div>
 
       <div class="ch-item reveal" data-ch="playful" style="transition-delay:.16s">
-        <span class="ch-name">Playful</span>
-        <span class="ch-tag">Challenging the romance of everyday life.</span>
+        <span class="ch-name" data-i18n="chars.playful.name">Playful</span>
+        <span class="ch-tag" data-i18n="chars.playful.tag">Challenging the romance of everyday life.</span>
       </div>
 
       <div class="ch-item reveal" data-ch="reflective" style="transition-delay:.24s">
-        <span class="ch-name">Reflective</span>
-        <span class="ch-tag">Sensitive to context and relations.</span>
+        <span class="ch-name" data-i18n="chars.reflective.name">Reflective</span>
+        <span class="ch-tag" data-i18n="chars.reflective.tag">Sensitive to context and relations.</span>
       </div>
 
     </div>
@@ -1861,32 +1989,32 @@
     <div class="ch-bar">
       <div class="ch-bar-left">
         <span class="ch-bar-star">✦</span>
-        <span class="ch-bar-motto">Experience the studio differently each time.</span>
+        <span class="ch-bar-motto" data-i18n="chars.motto">Experience the studio differently each time.</span>
       </div>
       <div class="ch-pills">
-        <button class="ch-pill" data-ch="questioning">Questioning</button>
-        <button class="ch-pill" data-ch="bold">Bold</button>
-        <button class="ch-pill" data-ch="critical">Critical</button>
-        <button class="ch-pill" data-ch="attentive">Attentive</button>
-        <button class="ch-pill" data-ch="expressive">Expressive</button>
-        <button class="ch-pill" data-ch="playful">Playful</button>
-        <button class="ch-pill" data-ch="reflective">Reflective</button>
+        <button class="ch-pill" data-ch="questioning" data-i18n="chars.questioning.name">Questioning</button>
+        <button class="ch-pill" data-ch="bold" data-i18n="chars.bold.name">Bold</button>
+        <button class="ch-pill" data-ch="critical" data-i18n="chars.critical.name">Critical</button>
+        <button class="ch-pill" data-ch="attentive" data-i18n="chars.attentive.name">Attentive</button>
+        <button class="ch-pill" data-ch="expressive" data-i18n="chars.expressive.name">Expressive</button>
+        <button class="ch-pill" data-ch="playful" data-i18n="chars.playful.name">Playful</button>
+        <button class="ch-pill" data-ch="reflective" data-i18n="chars.reflective.name">Reflective</button>
       </div>
-      <p class="ch-bar-right">The energy behind every decision,<br>every image, every collaboration.</p>
+      <p class="ch-bar-right" data-i18n-html="chars.energy">The energy behind every decision,<br>every image, every collaboration.</p>
     </div>
   </section>
 
   <!-- ── Founder bridge ── -->
   <section id="founder-bridge">
     <div class="fb-text">
-      <p class="fb-eyebrow reveal">Based in Lower Saxony, Germany</p>
+      <p class="fb-eyebrow reveal" data-i18n="founder.eyebrow">Based in Lower Saxony, Germany</p>
       <h2 class="fb-hl">
-        <span class="fb-line reveal" style="transition-delay:.1s">Get to know</span>
-        <span class="fb-line reveal" style="transition-delay:.26s">the <em><span class="fb-word-cycle">Designer.</span></em></span>
+        <span class="fb-line reveal" style="transition-delay:.1s" data-i18n="founder.l1">Get to know</span>
+        <span class="fb-line reveal" style="transition-delay:.26s"><span data-i18n="founder.l2">the</span> <em><span class="fb-word-cycle">Founder.</span></em></span>
       </h2>
       <div class="fb-cta reveal" style="transition-delay:.44s">
         <span class="fb-cta-line"></span>
-        <span class="fb-cta-text">of Dots &amp; Grain</span>
+        <span class="fb-cta-text" data-i18n="founder.cta">of Dots &amp; Grain</span>
       </div>
     </div>
   </section>
@@ -1970,13 +2098,13 @@
 
   <!-- ── Pre-contact statement ── -->
   <section class="contact-statement">
-    <p class="statement-body reveal">I move between disciplines not out of restlessness — because that's how I understand the world.</p>
+    <p class="statement-body reveal" data-i18n="statement">I move between disciplines not out of restlessness — because that's how I understand the world.</p>
   </section>
 
   <!-- ── Exhibitions ── -->
   <section id="exhibitions">
     <div class="exh-hd">
-      <span class="exh-label">Exhibitions &amp; Publications</span>
+      <span class="exh-label" data-i18n="exh.label">Exhibitions &amp; Publications</span>
     </div>
     <div class="exh-list">
 
@@ -2026,7 +2154,67 @@
 
     </div>
     <div class="exh-footer">
-      <a class="exh-cv-btn" href="Sitadevi_Zonneveld_CV.pdf" target="_blank" rel="noopener">CV →</a>
+      <a class="exh-cv-btn" href="Sitadevi_Zonneveld_CV.pdf" target="_blank" rel="noopener" data-i18n="exh.cv">CV →</a>
+    </div>
+  </section>
+
+  <!-- ── Services ── -->
+  <section id="services">
+    <div class="svc-hd">
+      <span class="svc-label" data-i18n="svc.label">✦ The Offer for You</span>
+      <h2 class="svc-headline" data-i18n-html="svc.hl">Services<br>We Offer</h2>
+      <p class="svc-intro" data-i18n="svc.intro">A creative offer around the representation and care of creative stakeholders. We meet you, where you need us.</p>
+    </div>
+    <div class="svc-list">
+
+      <div class="svc-item reveal">
+        <span class="svc-num">01</span>
+        <p class="svc-name" data-i18n="svc.s1.name">Photography</p>
+        <p class="svc-tags" data-i18n-html="svc.s1.tags">Events &amp; Exhibitions · Fashion<br>Commercial &amp; Editorial</p>
+      </div>
+
+      <div class="svc-item reveal">
+        <span class="svc-num">02</span>
+        <p class="svc-name" data-i18n="svc.s2.name">Brand Strategy</p>
+        <p class="svc-tags" data-i18n-html="svc.s2.tags">Company Branding · Personal Branding<br>Artistic Development · Campaigns</p>
+      </div>
+
+      <div class="svc-item reveal">
+        <span class="svc-num">03</span>
+        <p class="svc-name" data-i18n="svc.s3.name">Social Media</p>
+        <p class="svc-tags" data-i18n-html="svc.s3.tags">Strategy · Editorial Planning<br>Content Creation</p>
+      </div>
+
+      <div class="svc-item reveal">
+        <span class="svc-num">04</span>
+        <p class="svc-name" data-i18n="svc.s4.name">Illustration</p>
+        <p class="svc-tags" data-i18n-html="svc.s4.tags">Magazine · Personalized Artwork<br>Prints</p>
+      </div>
+
+      <div class="svc-item reveal">
+        <span class="svc-num">05</span>
+        <p class="svc-name" data-i18n="svc.s5.name">Print Design</p>
+        <p class="svc-tags" data-i18n-html="svc.s5.tags">Flyer · Poster · Business Card</p>
+      </div>
+
+      <div class="svc-item reveal">
+        <span class="svc-num">06</span>
+        <p class="svc-name" data-i18n="svc.s6.name">Panels &amp; Moderation</p>
+        <p class="svc-tags" data-i18n-html="svc.s6.tags">Events · Artistic Discussions<br>Cultural Programs</p>
+      </div>
+
+      <div class="svc-item reveal">
+        <span class="svc-num">07</span>
+        <p class="svc-name" data-i18n="svc.s7.name">Makeup Design</p>
+        <p class="svc-tags" data-i18n-html="svc.s7.tags">On-Set · Editorial<br>Artistic Concepts</p>
+      </div>
+
+      <div class="svc-item reveal">
+        <span class="svc-num">08</span>
+        <p class="svc-name" data-i18n="svc.s8.name">Workshops</p>
+        <p class="svc-tags" data-i18n-html="svc.s8.tags">Creative Labs · Educational Formats<br>Community &amp; Cultural Spaces</p>
+      </div>
+
     </div>
   </section>
 
@@ -2036,12 +2224,13 @@
     <div class="contact-center">
       <div class="contact-avail reveal">
         <span class="avail-dot"></span>
-        Available for Projects
+        <span data-i18n="contact.avail">Available for Projects</span>
       </div>
-      <a class="contact-email reveal" href="mailto:hello@dotsandgrain.studio" style="transition-delay:.1s">
-        hello@dotsandgrain.studio
+      <p class="contact-looking-fwd reveal" style="transition-delay:.06s" data-i18n="contact.looking">We'd love to hear what you'd like to work on.</p>
+      <a class="contact-email reveal" href="mailto:hello@dotsngrain.studio" style="transition-delay:.1s">
+        hello@dotsngrain.studio
       </a>
-      <div class="contact-meta reveal" style="transition-delay:.16s">
+      <div class="contact-meta reveal" style="transition-delay:.16s" data-i18n="contact.meta">
         German · English · Spanish
       </div>
       <img class="contact-logo-img reveal" src="logo-weiss.png" alt="Dots & Grain Studio" style="transition-delay:.22s">
@@ -2055,9 +2244,9 @@
       <p>© 2026 Dots &amp; Grain Studio</p>
       <p>Sitadevi Zonneveld — Lower Saxony, Germany</p>
       <p class="contact-legal">
-        <a href="/impressum/">Impressum</a>
+        <a href="impressum/index.html">Impressum</a>
         <span>·</span>
-        <a href="/datenschutz/">Datenschutz</a>
+        <a href="datenschutz/index.html">Datenschutz</a>
       </p>
     </div>
 
@@ -2088,6 +2277,181 @@
 </div>
 
 <script>
+  // ── i18n ─────────────────────────────────────────────────────
+  window._dgsLang = 'en';
+  window._dgsI18n = {
+    en: {
+      nav:{ about:'[ About ]', works:'[ Works ]', values:'[ Values ]', services:'[ Services ]', connect:'[ Connect ]' },
+      hero:{ sub:'Performative Arts — Fashion — Music', l1:'We challenge', l2:'single', l2em:'stories', l3:'through design', l4:'interventions.',
+        meta:{ studio:'Studio', location:'Location', locationVal:'Lower Saxony, Germany', available:'Available', availableVal:'Worldwide' } },
+      works:{ hl:'Every <em>image</em> is a story<br>told against the single version.', label:'Selected Work' },
+      wt:{ fashion:'Fashion', makeup:'Makeup Art', editorial:'Editorial', dance:'Dance', music:'Music', costume:'Costume', illustration:'Illustration', textile:'Textile Work', selfportrait:'Self-Portraiture' },
+      values:{
+        intro:{ hl:'The way I work is as important as the work itself.', sub:'These principles guide every collaboration, every conversation, and every creative decision.', link:'Studio Principles ↘' },
+        v1:{ h:'Concept before<br>aesthetics.', b:'Every project begins with a clear idea, thoughtful research, and a strategic framework. <em>Visual form should emerge from meaning</em>—not the other way around.' },
+        v2:{ h:'Connection before<br>representation.', b:'<em>Trust, dialogue, and collaboration</em> always come before image-making. I portray only what I can genuinely relate to or have built a meaningful relationship with.' },
+        v3:{ h:'<span style="white-space:nowrap">Some stories</span><br><span style="white-space:nowrap">are not ours</span><br><span style="white-space:nowrap">to tell.</span>', b:'I respect authorship, lived experience, and the boundaries of representation. <em>Not every perspective should be interpreted by me</em>, and not every story is mine to shape.' },
+        v4:{ h:'I do not<br>aestheticize suffering.', b:'<em>Pain, trauma, and vulnerability</em> are never treated as visual spectacle. Every story deserves care, nuance, and respect.' },
+        v5:{ h:'I understand design<br>as a shared resource.', b:'I use my skills, platform, and network to support, collaborate with, and <em>create opportunities for others</em> whenever possible.' },
+        v6:{ h:'Empathy is part<br>of the process.', b:'Sensitivity, reflection, and active listening guide every stage of my creative practice—<em>from research to execution</em>.' },
+        v7:{ h:'Allyship is an<br>ongoing practice.', b:'I strive to create work that respects people, communities, cultures, and the environments in which it exists. <em>Learning, listening, and accountability</em> remain essential parts of my practice.' },
+        v8:{ h:'<span style="white-space:nowrap">I encounter</span><br><span style="white-space:nowrap">the world</span><br><span style="white-space:nowrap">with optimism.</span>', b:'I believe design has the power to challenge assumptions, foster connection, and <em>create space for more thoughtful futures</em>. At the same time, I recognize that meaningful change requires me to set boundaries, make conscious decisions, and act with integrity.' }
+      },
+      chars:{
+        label:'I am.', count:'07 characteristics',
+        questioning:{ name:'Questioning', tag:'Exploring new ways of inhabiting the world.' },
+        bold:{ name:'Bold', tag:'Confident, direct and unapologetic.' },
+        critical:{ name:'Critical', tag:'Never following without questioning.' },
+        attentive:{ name:'Attentive', tag:'Balancing detail with concept, and precision with intuition.' },
+        expressive:{ name:'Expressive', tag:'Following intention without holding back.' },
+        playful:{ name:'Playful', tag:'Challenging the romance of everyday life.' },
+        reflective:{ name:'Reflective', tag:'Sensitive to context and relations.' },
+        motto:'Experience the studio differently each time.',
+        energy:'The energy behind every decision,<br>every image, every collaboration.'
+      },
+      founder:{ eyebrow:'Based in Lower Saxony, Germany', l1:'Get to know', l2:'the', cta:'of Dots & Grain' },
+      wordCycle:['Founder.','Designer.','Artist.','Photographer.','Art Director.','Researcher.'],
+      statement:'I move between disciplines not out of restlessness — because that\'s how I understand the world.',
+      exh:{ label:'Exhibitions & Publications', cv:'CV →' },
+      svc:{
+        label:'✦ The Offer for You', hl:'Services<br>We Offer', intro:'A creative offer around the representation and care of creative stakeholders. We meet you, where you need us.',
+        s1:{ name:'Photography', tags:'Events & Exhibitions · Fashion<br>Commercial & Editorial' },
+        s2:{ name:'Brand Strategy', tags:'Company Branding · Personal Branding<br>Artistic Development · Campaigns' },
+        s3:{ name:'Social Media', tags:'Strategy · Editorial Planning<br>Content Creation' },
+        s4:{ name:'Illustration', tags:'Magazine · Personalized Artwork<br>Prints' },
+        s5:{ name:'Print Design', tags:'Flyer · Poster · Business Card' },
+        s6:{ name:'Panels & Moderation', tags:'Events · Artistic Discussions<br>Cultural Programs' },
+        s7:{ name:'Makeup Design', tags:'On-Set · Editorial<br>Artistic Concepts' },
+        s8:{ name:'Workshops', tags:'Creative Labs · Educational Formats<br>Community & Cultural Spaces' }
+      },
+      contact:{ avail:'Available for Projects', looking:'We\'d love to hear what you\'d like to work on.', meta:'German · English · Spanish' },
+      about:[
+        'My heart keeps falling for the intersection of photography, music, performance and especially dance. Whenever I get to be part of projects bringing those elements together, my inner child starts to bloom.',
+        'And behind that is a personal story.',
+        'When I was nine, I danced through the living room with my mother to Shakira, Christina Aguilera and Sade. My parents were singing teachers. They gave me rhythm, curiosity, and a sensitivity to music, art and culture. Our house was blessed with friends visiting us from all over the world. They taught me how to dance. With my hips and chest stuffed with balloons, little me quickly thought I was Shakira.',
+        'I took ballet, contemporary and hip-hop classes for years. Then my father died. The lessons quietly came to an end. After my father died, the money for lessons was gone. We no longer had the financial resources so I could continue. At thirteen, I started working in a bakery. For years, I saved up to buy myself my first camera. It became my entry ticket into the worlds I never stopped caring about — a way of participating. The need to express myself never did. It runs through my veins. It is my fuel.',
+        'This is what makes my relationship with the places I enter through the camera so particular. In those moments, I return to my inner child. Away from the weight that systems and adulthood place on us.',
+        'I don\'t just observe what\'s unfolding in front of my camera. I connect with it. I feel the energy, the tension, the rhythm. Even when I\'m not physically moving, I\'m moving with you. I trace feelings and movement. It\'s a way of thinking you develop, that most dancers can empathize with.',
+        'I am drawn to the places where boundaries dissolve — between disciplines, between cultures, between languages, between observer and participant, between the personal and the collective. I don\'t belong to just one world — I need more than one door. So the camera became my way back in.',
+        'That\'s a story of resilience of a young girl who lost her father and with that access to worlds. In reality, I never stopped dancing.'
+      ]
+    },
+
+    de: {
+      nav:{ about:'[ Über mich ]', works:'[ Portfolio ]', values:'[ Prinzipien ]', services:'[ Unser Service ]', connect:'[ Kontakt ]' },
+      hero:{ sub:'Performative Künste — Mode — Musik', l1:'We challenge', l2:'single', l2em:'stories', l3:'through design', l4:'interventions.',
+        meta:{ studio:'Studio', location:'Standort', locationVal:'Niedersachsen, Deutschland', available:'Verfügbar', availableVal:'Weltweit' } },
+      works:{ hl:'Every <em>image</em> is a story<br>told against the single version.', label:'Ausgewählte Arbeiten' },
+      wt:{ fashion:'Mode', makeup:'Makeup Art', editorial:'Editorial', dance:'Tanz', music:'Musik', costume:'Kostümdesign', illustration:'Illustration', textile:'Textildesign', selfportrait:'Selbstporträt' },
+      values:{
+        intro:{ hl:'Wie wir arbeiten, ist so bedeutsam wie das, was dabei entsteht.', sub:'Diese Grundsätze leiten jede Zusammenarbeit, jedes Gespräch und jede kreative Entscheidung.', link:'Studio-Prinzipien ↘' },
+        v1:{ h:'Konzept vor<br>Ästhetik.', b:'Jedes Projekt beginnt mit einer klaren Haltung, sorgfältiger Recherche und einem konzeptionellen Rahmen. <em>Visuelle Form entsteht aus Bedeutung</em> — nicht andersherum.' },
+        v2:{ h:'Verbindung vor<br>Darstellung.', b:'<em>Vertrauen, Dialog und Zusammenarbeit</em> kommen immer vor der Bildgestaltung. Wir zeigen nur das, was uns wirklich berührt — oder wozu wir eine echte Beziehung aufgebaut haben.' },
+        v3:{ h:'<span style="white-space:nowrap">Manche Geschichten</span><br><span style="white-space:nowrap">sind nicht</span><br><span style="white-space:nowrap">die unseren.</span>', b:'Wir respektieren Autorschaft, gelebte Erfahrung und die Grenzen der Repräsentation. <em>Nicht jeder Blick ist unserer</em> — und nicht jede Geschichte wartet darauf, von uns gestaltet zu werden.' },
+        v4:{ h:'Wir ästhetisieren<br>kein Leid.', b:'<em>Schmerz, Trauma und Verletzlichkeit</em> werden nie zum visuellen Spektakel. Jede Geschichte verdient Sorgfalt, Nuance und Respekt.' },
+        v5:{ h:'Wir verstehen Design<br>als gemeinsames Gut.', b:'Wir setzen unsere Fähigkeiten, Plattform und unser Netzwerk dafür ein, andere zu unterstützen, gemeinsam zu gestalten und <em>Räume zu öffnen</em>, wo es möglich ist.' },
+        v6:{ h:'Empathie gehört<br>zum Prozess.', b:'Sensibilität, Reflexion und echtes Zuhören begleiten jede Phase unserer kreativen Praxis — <em>von der Recherche bis zur Umsetzung</em>.' },
+        v7:{ h:'Solidarität ist eine<br>fortlaufende Praxis.', b:'Wir streben danach, Arbeit zu schaffen, die Menschen, Gemeinschaften und Kulturen in ihrer Vielschichtigkeit respektiert. <em>Lernen, Zuhören und Verantwortung übernehmen</em> — das bleibt ein fortlaufender Prozess.' },
+        v8:{ h:'<span style="white-space:nowrap">Wir begegnen</span><br><span style="white-space:nowrap">der Welt</span><br><span style="white-space:nowrap">mit Optimismus.</span>', b:'Wir glauben, dass Design die Kraft hat, Annahmen zu hinterfragen, Verbindungen zu schaffen und <em>Raum für eine reflektiertere Zukunft zu öffnen</em>. Gleichzeitig erkennen wir: Echter Wandel braucht klare Haltung, bewusste Entscheidungen und Integrität.' }
+      },
+      chars:{
+        label:'Ich bin.', count:'07 Eigenschaften',
+        questioning:{ name:'Hinterfragend', tag:'Auf der Suche nach neuen Arten, die Welt zu bewohnen.' },
+        bold:{ name:'Mutig', tag:'Selbstbewusst, direkt und ohne Entschuldigungen.' },
+        critical:{ name:'Kritisch', tag:'Niemals folgen ohne zu hinterfragen.' },
+        attentive:{ name:'Aufmerksam', tag:'Detail und Konzept im Gleichgewicht, Präzision mit Intuition.' },
+        expressive:{ name:'Ausdrucksstark', tag:'Intention folgen, ohne zurückzuhalten.' },
+        playful:{ name:'Spielerisch', tag:'Die Romantik des Alltags herausfordern.' },
+        reflective:{ name:'Reflektierend', tag:'Sensibel für Kontext und Beziehungen.' },
+        motto:'Das Studio jedes Mal anders erleben.',
+        energy:'Die Energie hinter jeder Entscheidung,<br>jedem Bild, jeder Zusammenarbeit.'
+      },
+      founder:{ eyebrow:'Ansässig in Niedersachsen, Deutschland', l1:'Get to know', l2:'the', cta:'von Dots & Grain' },
+      wordCycle:['Founder.','Designer.','Artist.','Photographer.','Art Director.','Researcher.'],
+      statement:'I move between disciplines not out of restlessness — because that\'s how I understand the world.',
+      exh:{ label:'Ausstellungen & Publikationen', cv:'CV →' },
+      svc:{
+        label:'✦ Das Angebot für dich', hl:'Services<br>We Offer', intro:'Ein kreatives Angebot rund um die Repräsentation und Begleitung kreativer Akteur·innen. Wir sind für dich da, wo du uns brauchst.',
+        s1:{ name:'Fotografie', tags:'Events & Ausstellungen · Fashion<br>Commercial & Editorial' },
+        s2:{ name:'Markenstrategie', tags:'Unternehmensbranding · Personal Branding<br>Künstlerische Entwicklung · Kampagnen' },
+        s3:{ name:'Social Media', tags:'Strategie · Redaktionsplanung<br>Content-Erstellung' },
+        s4:{ name:'Illustration', tags:'Magazin · Personalisierte Kunstwerke<br>Kunstdrucke' },
+        s5:{ name:'Printdesign', tags:'Flyer · Poster · Visitenkarte' },
+        s6:{ name:'Panels & Moderation', tags:'Events · Künstlerische Gespräche<br>Kulturprogramme' },
+        s7:{ name:'Makeup-Design', tags:'On-Set · Editorial<br>Künstlerische Konzepte' },
+        s8:{ name:'Workshops', tags:'Creative Labs · Bildungsformate<br>Community & Kulturräume' }
+      },
+      contact:{ avail:'Offen für Projekte', looking:'Schreibe uns, woran du arbeiten möchtest.', meta:'Deutsch · Englisch · Spanisch' },
+      about:[
+        'Mein Herz schlägt immer wieder für die Schnittstelle von Fotografie, Musik, Performance und ganz besonders Tanz. Immer wenn ich an Projekten mitwirken darf, die diese Elemente verbinden, beginnt mein inneres Kind aufzublühen.',
+        'Und dahinter steckt eine persönliche Geschichte.',
+        'Mit neun Jahren tanzte ich mit meiner Mutter im Wohnzimmer zu Shakira, Christina Aguilera und Sade. Meine Eltern waren Gesangslehrer. Sie gaben mir Rhythmus, Neugier und ein Gespür für Musik, Kunst und Kultur. Unser Zuhause war gesegnet mit Freunden aus aller Welt. Sie lehrten mich tanzen. Mit Hüften und Brust voller Luftballons glaubte das kleine Ich schnell, ich wäre Shakira.',
+        'Ich nahm Jahre lang Ballett-, Zeitgenössischen und Hip-Hop-Unterricht. Dann starb mein Vater. Die Stunden endeten still. Nach seinem Tod war das Geld dafür nicht mehr da. Wir hatten nicht mehr die finanziellen Mittel, damit ich weitermachen konnte. Mit dreizehn fing ich in einer Bäckerei an zu arbeiten. Jahrelang sparte ich, um mir meine erste Kamera zu kaufen. Sie wurde mein Eintrittsticket in die Welten, um die ich mich nie aufgehört hatte zu kümmern — eine Möglichkeit, teilzuhaben. Das Bedürfnis, mich auszudrücken, nie. Es fließt durch meine Adern. Es ist mein Antrieb.',
+        'Das ist es, was meine Beziehung zu den Orten, die ich durch die Kamera betrete, so besonders macht. In diesen Momenten kehre ich zu meinem inneren Kind zurück. Weg von der Last, die Systeme und das Erwachsenwerden auf uns legen.',
+        'Ich beobachte nicht nur, was sich vor meiner Kamera entfaltet. Ich verbinde mich damit. Ich spüre die Energie, die Spannung, den Rhythmus. Auch wenn ich mich nicht körperlich bewege, bewege ich mich mit dir. Ich verfolge Gefühle und Bewegung. Es ist eine Denkweise, die man entwickelt, mit der die meisten Tänzer·innen mitfühlen können.',
+        'Ich fühle mich zu den Orten hingezogen, wo Grenzen sich auflösen — zwischen Disziplinen, zwischen Kulturen, zwischen Sprachen, zwischen Beobachter·in und Teilnehmer·in, zwischen dem Persönlichen und dem Kollektiven. Ich gehöre nicht nur einer Welt — ich brauche mehr als eine Tür. So wurde die Kamera mein Weg zurück.',
+        'Das ist eine Geschichte der Resilienz eines jungen Mädchens, das seinen Vater verlor und damit den Zugang zu Welten. In Wirklichkeit habe ich nie aufgehört zu tanzen.'
+      ]
+    },
+
+    es: {
+      nav:{ about:'[ Sobre mí ]', works:'[ Portafolio ]', values:'[ Principios ]', services:'[ Servicios ]', connect:'[ Contacto ]' },
+      hero:{ sub:'Artes Performativas — Moda — Música', l1:'We challenge', l2:'single', l2em:'stories', l3:'through design', l4:'interventions.',
+        meta:{ studio:'Estudio', location:'Ubicación', locationVal:'Baja Sajonia, Alemania', available:'Disponible', availableVal:'En todo el mundo' } },
+      works:{ hl:'Cada <em>imagen</em> es una historia<br>contra la versión única.', label:'Trabajo Seleccionado' },
+      wt:{ fashion:'Moda', makeup:'Makeup Art', editorial:'Editorial', dance:'Danza', music:'Música', costume:'Diseño de Vestuario', illustration:'Ilustración', textile:'Arte Textil', selfportrait:'Autorretrato' },
+      values:{
+        intro:{ hl:'La forma en que trabajo es tan importante como el trabajo mismo.', sub:'Estos principios guían cada colaboración, cada conversación y cada decisión creativa.', link:'Principios del Estudio ↘' },
+        v1:{ h:'Concepto antes<br>que estética.', b:'Cada proyecto comienza con una idea clara, una investigación cuidadosa y un marco estratégico. <em>La forma visual debe emerger del significado</em>, no al revés.' },
+        v2:{ h:'Conexión antes<br>que representación.', b:'<em>La confianza, el diálogo y la colaboración</em> siempre vienen antes que la creación de imágenes. Solo retrato lo que puedo relacionar genuinamente o con lo que he construido una relación significativa.' },
+        v3:{ h:'<span style="white-space:nowrap">Algunas historias</span><br><span style="white-space:nowrap">no nos pertenecen</span><br><span style="white-space:nowrap">a nosotros contar.</span>', b:'Respeto la autoría, la experiencia vivida y los límites de la representación. <em>No toda perspectiva debe ser interpretada por mí</em>, y no toda historia es mía para dar forma.' },
+        v4:{ h:'No estetizo<br>el sufrimiento.', b:'<em>El dolor, el trauma y la vulnerabilidad</em> nunca se tratan como espectáculo visual. Cada historia merece cuidado, matiz y respeto.' },
+        v5:{ h:'Entiendo el diseño<br>como recurso compartido.', b:'Uso mis habilidades, plataforma y red para apoyar, colaborar y <em>crear oportunidades para otros</em> siempre que sea posible.' },
+        v6:{ h:'La empatía es parte<br>del proceso.', b:'La sensibilidad, la reflexión y la escucha activa guían cada etapa de mi práctica creativa — <em>desde la investigación hasta la ejecución</em>.' },
+        v7:{ h:'La solidaridad es una<br>práctica continua.', b:'Me esfuerzo por crear trabajos que respeten a las personas, comunidades, culturas y los entornos en que existen. <em>Aprender, escuchar y la responsabilidad</em> siguen siendo partes esenciales de mi práctica.' },
+        v8:{ h:'<span style="white-space:nowrap">Encuentro</span><br><span style="white-space:nowrap">el mundo</span><br><span style="white-space:nowrap">con optimismo.</span>', b:'Creo que el diseño tiene el poder de desafiar supuestos, fomentar la conexión y <em>crear espacio para futuros más reflexivos</em>. Al mismo tiempo, reconozco que el cambio significativo requiere establecer límites, tomar decisiones conscientes y actuar con integridad.' }
+      },
+      chars:{
+        label:'Soy.', count:'07 características',
+        questioning:{ name:'Cuestionadora', tag:'Explorando nuevas formas de habitar el mundo.' },
+        bold:{ name:'Audaz', tag:'Segura, directa y sin disculpas.' },
+        critical:{ name:'Crítica', tag:'Nunca siguiendo sin cuestionar.' },
+        attentive:{ name:'Atenta', tag:'Equilibrando el detalle con el concepto, y la precisión con la intuición.' },
+        expressive:{ name:'Expresiva', tag:'Siguiendo la intención sin contención.' },
+        playful:{ name:'Lúdica', tag:'Desafiando el romance de la vida cotidiana.' },
+        reflective:{ name:'Reflexiva', tag:'Sensible al contexto y a las relaciones.' },
+        motto:'Experimenta el estudio de manera diferente cada vez.',
+        energy:'La energía detrás de cada decisión,<br>cada imagen, cada colaboración.'
+      },
+      founder:{ eyebrow:'Con sede en Baja Sajonia, Alemania', l1:'Conoce a', l2:'la', cta:'de Dots & Grain' },
+      wordCycle:['Fundadora.','Diseñadora.','Artista.','Fotógrafa.','Directora de Arte.','Investigadora.'],
+      statement:'Me muevo entre disciplinas no por inquietud — sino porque así es como entiendo el mundo.',
+      exh:{ label:'Exposiciones & Publicaciones', cv:'CV →' },
+      svc:{
+        label:'✦ La Oferta para Ti', hl:'Nuestros<br>Servicios', intro:'Una oferta creativa en torno a la representación y el acompañamiento de actores creativos. Te encontramos donde nos necesitas.',
+        s1:{ name:'Fotografía', tags:'Eventos & Exposiciones · Moda<br>Comercial & Editorial' },
+        s2:{ name:'Estrategia de Marca', tags:'Branding Corporativo · Personal Branding<br>Desarrollo Artístico · Campañas' },
+        s3:{ name:'Redes Sociales', tags:'Estrategia · Planificación Editorial<br>Creación de Contenido' },
+        s4:{ name:'Ilustración', tags:'Revista · Arte Personalizado<br>Impresiones' },
+        s5:{ name:'Diseño Editorial', tags:'Flyer · Póster · Tarjeta de Visita' },
+        s6:{ name:'Paneles & Moderación', tags:'Eventos · Diálogos Artísticos<br>Programas Culturales' },
+        s7:{ name:'Diseño de Maquillaje', tags:'On-Set · Editorial<br>Conceptos Artísticos' },
+        s8:{ name:'Talleres', tags:'Creative Labs · Formatos Educativos<br>Espacios Comunitarios & Culturales' }
+      },
+      contact:{ avail:'Disponible para Proyectos', looking:'Nos encantaría saber en qué te gustaría trabajar.', meta:'Alemán · Inglés · Español' },
+      about:[
+        'Mi corazón sigue cayendo en la intersección de la fotografía, la música, el performance y especialmente la danza. Cada vez que tengo la oportunidad de ser parte de proyectos que unen estos elementos, mi niña interior comienza a florecer.',
+        'Y detrás de eso hay una historia personal.',
+        'Cuando tenía nueve años, bailé por el salón con mi madre al ritmo de Shakira, Christina Aguilera y Sade. Mis padres eran profesores de canto. Me dieron ritmo, curiosidad y sensibilidad por la música, el arte y la cultura. Nuestra casa fue bendecida con amigos que nos visitaban de todo el mundo. Ellos me enseñaron a bailar.',
+        'Tomé clases de ballet, contemporáneo y hip-hop durante años. Luego murió mi padre. Las clases terminaron silenciosamente. Después de su muerte, el dinero para las clases ya no estaba. Ya no teníamos los recursos económicos para que yo pudiera continuar. A los trece años, empecé a trabajar en una panadería. Durante años ahorré para comprarme mi primera cámara. Se convirtió en mi entrada a los mundos que nunca dejé de querer — una forma de participar. La necesidad de expresarme jamás se fue. Corre por mis venas. Es mi combustible.',
+        'Esto es lo que hace tan particular mi relación con los lugares a los que entro a través de la cámara. En esos momentos, regreso a mi niña interior. Lejos del peso que los sistemas y la adultez nos imponen.',
+        'No solo observo lo que se desarrolla frente a mi cámara. Me conecto con ello. Siento la energía, la tensión, el ritmo. Incluso cuando no me estoy moviendo físicamente, me muevo contigo. Rastro sentimientos y movimiento. Es una forma de pensar que se desarrolla, con la que la mayoría de los bailarines pueden empatizar.',
+        'Me atraen los lugares donde los límites se disuelven — entre disciplinas, entre culturas, entre idiomas, entre observador y participante, entre lo personal y lo colectivo. No pertenezco a un solo mundo — necesito más de una puerta. Así que la cámara se convirtió en mi camino de regreso.',
+        'Es la historia de resiliencia de una niña que perdió a su padre y con ello el acceso a ciertos mundos. En realidad, nunca dejé de bailar.'
+      ]
+    }
+  };
+
   // ── Cursor (smooth lerp)
   const cur      = document.getElementById('cursor');
   const curLabel = document.getElementById('cursor-label');
@@ -2139,6 +2503,7 @@
   function applyNavDark(zone, active) {
     active ? _navDarkZones.add(zone) : _navDarkZones.delete(zone);
     navEl.classList.toggle('nav-on-dark', _navDarkZones.size > 0);
+    document.body.classList.toggle('cursor-on-dark', _navDarkZones.size > 0);
   }
   // Hero is a dark section → white nav while visible
   const heroEl2 = document.getElementById('hero');
@@ -2154,6 +2519,13 @@
     new IntersectionObserver(([e]) => applyNavDark('contact', e.isIntersecting), {
       threshold: 0.05
     }).observe(contactEl);
+  }
+  // Services is a dark section → white cursor while visible
+  const servicesEl = document.getElementById('services');
+  if (servicesEl) {
+    new IntersectionObserver(([e]) => applyNavDark('services', e.isIntersecting), {
+      threshold: 0.05
+    }).observe(servicesEl);
   }
 
   // Preload spread images
@@ -2269,16 +2641,43 @@
   function clipStart(vid) { return parseFloat(vid.dataset.start ?? 8); }
   function clipEnd(vid)   { return vid.dataset.end ? parseFloat(vid.dataset.end) : null; }
 
+  function prePositionNext() {
+    const nextIdx = (bgIdx + 1) % bgVideos.length;
+    if (bgVideos.length < 2 || nextIdx === bgIdx) return;
+    const upcoming = bgVideos[nextIdx];
+    const start = clipStart(upcoming);
+    if (upcoming.readyState >= 1 && Math.abs(upcoming.currentTime - start) > 0.5) {
+      upcoming.currentTime = start;
+    }
+  }
+
   function goNextVideo() {
     clearTimeout(rotateTimer);
     bgVideos[bgIdx].classList.remove('active');
     bgIdx = (bgIdx + 1) % bgVideos.length;
     const next = bgVideos[bgIdx];
-    next.currentTime = clipStart(next);
-    next.play().catch(() => {});
-    next.classList.add('active');
+    const start = clipStart(next);
     const dur = next.dataset.duration ? parseInt(next.dataset.duration) : 7000;
-    rotateTimer = setTimeout(goNextVideo, dur);
+
+    const activateNext = () => {
+      next.classList.add('active');
+      next.play().catch(() => {});
+      rotateTimer = setTimeout(goNextVideo, dur);
+      setTimeout(prePositionNext, 200);
+    };
+
+    const alreadyPositioned = start === 0 || (next.readyState >= 2 && Math.abs(next.currentTime - start) < 0.5);
+    if (alreadyPositioned) {
+      activateNext();
+    } else {
+      next.currentTime = start;
+      const fallback = setTimeout(() => {
+        next.removeEventListener('seeked', onSeeked);
+        activateNext();
+      }, 1500);
+      const onSeeked = () => { clearTimeout(fallback); activateNext(); };
+      next.addEventListener('seeked', onSeeked, { once: true });
+    }
   }
 
   bgVideos.forEach(vid => {
@@ -2291,17 +2690,13 @@
     vid.addEventListener('ended', goNextVideo);
   });
 
-  // Seek first video to its start point, reveal only after seek is ready
+  // First video is already active via HTML class — just start rotation timer
   const firstVid = bgVideos[0];
-  if (firstVid) {
-    const showFirst = () => {
-      firstVid.currentTime = clipStart(firstVid);
-      firstVid.addEventListener('seeked', () => firstVid.classList.add('active'), { once: true });
-    };
-    firstVid.readyState >= 1 ? showFirst() : firstVid.addEventListener('loadedmetadata', showFirst, { once: true });
+  if (firstVid && bgVideos.length > 1) {
+    firstVid.play().catch(() => {});
+    rotateTimer = setTimeout(goNextVideo, 14000);
+    setTimeout(prePositionNext, 500);
   }
-
-  if (bgVideos.length > 1) rotateTimer = setTimeout(goNextVideo, 14000);
 
   // ── Scroll-driven: nav state, progress bar
   const progEl = document.getElementById('scroll-progress');
@@ -2444,14 +2839,11 @@
   (function() {
     const container = document.getElementById('about-type-container');
     if (!container) return;
-    const paras = [
-      'I left home early to follow my passion. I landed in Hildesheim, where I studied graphic design. Then came Colombia. I went looking for something I couldn\'t name — only to discover that it had been there all along, quietly present. I was walking the same paths my father had travelled thirty years earlier. When I was nine, I danced through the living room with my mother to Shakira, Christina Aguilera and Sade. My parents were singing teachers. They gave me rhythm, curiosity, and a sensitivity to music, art and culture. Our house was always full of friends visiting us from all over the world. I learned to dance with them. With my hips and chest stuffed with balloons, I already thought I was Shakira.',
-      'As a teenager, I started taking dance and singing classes. Then my father died. Silence. The lessons quietly came to an end. But the need to express myself never did. It runs through my veins. It is my fuel. I don\'t belong to just one world — I need more than one door. I move between disciplines, between languages, between cultures and between ways of seeing. The camera became my way in.',
-      'After my father died, the money for lessons was gone. At fourteen, I started working in a bakery. For years, I worked to buy myself a camera. It became my entry ticket into the worlds I cared about — a way of getting close, of looking, of participating. Those worlds became part of me. This is what makes my relationship with the places I enter through the camera so particular. In those moments, I return to my inner child. I remember my father. I become free again — away from the weight that systems and adulthood place on us. I start to dance. I start to feel. I start to express myself through photographs, videos and illustrations. I am drawn to the places where boundaries dissolve — between disciplines, between cultures, between observer and participant, between the personal and the collective. That is where I flourish. Conceptually. Sensitively. Personally.'
-    ];
+    const aboutSec = document.getElementById('about');
     const cursor = document.createElement('span');
     cursor.className = 'type-cursor-about';
-    let pIdx = 0, cIdx = 0, currentP = null, started = false;
+    let paras = [], pIdx = 0, cIdx = 0, currentP = null, started = false, obs;
+    function getParas() { return ((window._dgsI18n||{})[window._dgsLang||'en']||{}).about || []; }
     function nextPara() {
       if (currentP) cursor.remove();
       currentP = document.createElement('p');
@@ -2472,21 +2864,32 @@
         else cursor.remove();
       }
     }
-    const aboutSec = document.getElementById('about');
-    new IntersectionObserver(([e], obs) => {
-      if (e.isIntersecting && !started) {
-        started = true; obs.disconnect();
-        nextPara(); setTimeout(tick, 300);
-      }
-    }, { threshold: 0.2 }).observe(aboutSec || container);
+    function startTyping() {
+      paras = getParas(); pIdx = 0; cIdx = 0; currentP = null; started = true;
+      container.innerHTML = ''; container.appendChild(cursor);
+      nextPara(); setTimeout(tick, 300);
+    }
+    function setupObserver() {
+      obs = new IntersectionObserver(([e], o) => {
+        if (e.isIntersecting && !started) { startTyping(); o.disconnect(); }
+      }, { threshold: 0.2 });
+      obs.observe(aboutSec || container);
+    }
+    setupObserver();
+    window._dgsAboutReset = function() {
+      if (obs) obs.disconnect();
+      started = false; container.innerHTML = ''; currentP = null;
+      setupObserver();
+    };
   })();
 
   // ── Founder bridge — word cycle ──
   (function() {
     const el = document.querySelector('.fb-word-cycle');
     if (!el) return;
-    const words = ['Designer.', 'Artist.', 'Photographer.', 'Art Director.', 'Researcher.'];
+    let words = ((window._dgsI18n||{})[window._dgsLang||'en']||{}).wordCycle || ['Founder.','Designer.','Artist.','Photographer.','Art Director.','Researcher.'];
     let idx = 0;
+    let timer = null;
     function next() {
       el.classList.add('out');
       setTimeout(() => {
@@ -2497,7 +2900,22 @@
         requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('in')));
       }, 380);
     }
-    setInterval(next, 2600);
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        idx = 0;
+        el.textContent = words[0];
+        if (!timer) timer = setInterval(next, 2600);
+      } else {
+        clearInterval(timer);
+        timer = null;
+      }
+    }, { threshold: 0.3 }).observe(document.getElementById('founder-bridge') || el);
+    window._dgsUpdateWordCycle = function(lang) {
+      const newWords = ((window._dgsI18n||{})[lang]||{}).wordCycle;
+      if (!newWords) return;
+      words = newWords; idx = 0;
+      el.textContent = words[0];
+    };
   })();
 
   // ── Founder bridge — text parallax ──
@@ -2587,17 +3005,19 @@
       if (pcDiscover) pcDiscover.classList.toggle('visible', !flipped);
     }
 
-    // Show portrait from start of #about through end of #exhibitions
+    // Show portrait from start of #about through end of #exhibitions (hide before #services)
     const founderBridge    = document.getElementById('founder-bridge');
     const aboutSection     = document.getElementById('about');
     const exhibitionsSection = document.getElementById('exhibitions');
+    const servicesSection  = document.getElementById('services');
 
     function syncPortrait() {
       if (!aboutSection) return;
       const aboutTop  = aboutSection.getBoundingClientRect().top;
       const endEl     = exhibitionsSection || aboutSection;
       const endBottom = endEl.getBoundingClientRect().bottom;
-      const shouldShow = aboutTop < window.innerHeight * 0.75 && endBottom > 100;
+      const servicesTop = servicesSection ? servicesSection.getBoundingClientRect().top : Infinity;
+      const shouldShow = aboutTop < window.innerHeight * 0.75 && endBottom > 100 && servicesTop > window.innerHeight * 0.5;
       portraitCard.classList.toggle('visible', shouldShow);
     }
 
@@ -2767,6 +3187,35 @@
 
   document.getElementById('dgs-favicon').href = c.toDataURL('image/png');
 })();
+
+  // ── Language switcher ─────────────────────────────────────────
+  function _dgsGetVal(obj, path) {
+    return path.split('.').reduce(function(o,k){ return o&&o[k]; }, obj);
+  }
+  function applyLang(lang) {
+    const t = (window._dgsI18n||{})[lang];
+    if (!t) return;
+    window._dgsLang = lang;
+    try { localStorage.setItem('dgs-lang', lang); } catch(e) {}
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      const v = _dgsGetVal(t, el.getAttribute('data-i18n'));
+      if (v !== undefined) el.textContent = v;
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(function(el) {
+      const v = _dgsGetVal(t, el.getAttribute('data-i18n-html'));
+      if (v !== undefined) el.innerHTML = v;
+    });
+    document.querySelectorAll('.lang-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+    });
+    if (window._dgsUpdateWordCycle) window._dgsUpdateWordCycle(lang);
+    if (window._dgsAboutReset) window._dgsAboutReset();
+  }
+  document.querySelectorAll('.lang-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() { applyLang(this.getAttribute('data-lang')); });
+  });
+
 </script>
 </body>
 </html>
